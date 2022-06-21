@@ -32,7 +32,7 @@ GLfloat l = -1.0, r = 1.0, t = 1.0, b = -1.0, zNear = 0.5, zFar = 6;
 GLfloat radius = 1, thetal = 180, phi = 0;
 GLfloat dr = 5 * M_PI / 180;  
 GLfloat theta[] = { 0,0,0 };
-GLfloat quay[1] = { 0 };
+
 
 mat4 model;
 mat4 quayBase;
@@ -127,12 +127,12 @@ void shaderSetup( void )
     glClearColor( 1.0, 1.0, 1.0, 1.0 );        /* Thiết lập màu trắng là màu xóa màn hình*/
 }
 
+GLfloat z,x;
+
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt) {
-	point4 eye(0,
-		       1,
-		       1,
-		       1.0);
+	point4 eye(0, 1, 1, 1.0);
 	point4 at(sin(thetal), 1, 1 + cos(thetal), 1.0);
+	
 	vec4 up(0, 1, 0, 1.0);
 
 	mat4 v = LookAt(eye, at, up);
@@ -159,9 +159,9 @@ GLfloat keo = 0;
 bool checkkeo = false;
 
 void manChieu() {
-	model = Translate(0, 0.5 * keo, -6.8 );
+	model = Translate(0, 0.5 * keo, -6.8 ) * RotateY(180);
 	matPhang(wM, hM - keo, dM, model);
-	model = Translate(0, 0.5 * hM + 0.5 * hTN, -6.8);
+	model = Translate(0, 0.5 * hM + 0.5 * hTN, -6.8) * RotateY(180);
 	matPhang(wTN, hTN, dTN, model);
 
 }
@@ -207,6 +207,9 @@ void chanBan() {
 	model = Translate(0, -0.24, 0);
 	matPhang(0.78, 0.02, 0.02, model);
 
+	//hop may tinh
+	model = Translate(-0.2, 0.02, 0.05);
+	matPhang(0.2, 0.35, 0.4, model);
 }
 
 void MayTinh() {
@@ -219,34 +222,34 @@ void MayTinh() {
 	matPhang(0.05, 0.25, 0.02, model);
 
 	//Man may tinh
-	model = Translate(0, 0.7, 0) * RotateY(180);
+	model = Translate(0, 0.7, 0);
 	matPhang(0.35, 0.4, 0.04, model);
 }
 
 GLfloat keoghe = 0;
 bool checkkeoghe = false;
 void matGhe() {
-	model = Translate(0, 0, 0.5 + keoghe);
+	model = Translate(0, 0, -0.5 - keoghe);
 	matPhang(0.4, 0.02, 0.25, model);
-	model = Translate(0, 0.15, 0.62 + keoghe) * RotateX(90);
+	model = Translate(0, 0.15, -0.62 - keoghe) * RotateX(90);
 	matPhang(0.4, 0.02, 0.25, model);
 }
 
 void chanGhe() {
 	//chan 1
-	model = Translate(-0.175, -0.15, 0.4 + keoghe);
+	model = Translate(-0.175, -0.15, -0.4 - keoghe);
 	matPhang(0.02, 0.3, 0.02, model);
 
 	//chan 2
-	model = Translate(-0.175, -0.15, 0.6+ keoghe);
+	model = Translate(-0.175, -0.15, -0.6 - keoghe);
 	matPhang(0.02, 0.3, 0.02, model);
 
 	//chan 3
-	model = Translate(0.175, -0.15, 0.4 + keoghe);
+	model = Translate(0.175, -0.15, -0.4 - keoghe);
 	matPhang(0.02, 0.3, 0.02, model);
 
 	//chan 4
-	model = Translate(0.175, -0.15, 0.6 + keoghe);
+	model = Translate(0.175, -0.15, -0.6 - keoghe);
 	matPhang(0.02, 0.3, 0.02, model);
 
 	
@@ -258,6 +261,7 @@ void caiGhe() {
 
 
 void caiBan() {
+
 	matBan();
 	chanBan();
 	MayTinh();
@@ -391,7 +395,7 @@ void san() {
 
 
 void bang() {
-	model = Translate(0, 2.2, -6.85);
+	model = Translate(0, 2.2, -6.85) * RotateY(180);
 	matPhang(3, 3, 0.02, model);
 }
 
@@ -404,51 +408,51 @@ void cuaChinh() {
 	matPhang(0.02, 1.5, 0.75, model);
 
 	//canh cua 2 
-	model =  Translate(-3.25, 0, -3.75)*RotateY(180)  * RotateY(quayCuaChinh2) * Translate(0, 0.4, 0.5 * 0.75);
+	model =  Translate(-3.25, 0, -3.75)* RotateY(180)  * RotateY(quayCuaChinh2) * Translate(0, 0.4, 0.5 * 0.75);
 	matPhang(0.02, 1.5, 0.75, model);
 }
 
 
 
-GLfloat z,x;
+
 void canPhong() {
-	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, 0) * RotateY(-90);
+	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, 0) * RotateY(90);
 	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(0.23, 0, 0) * RotateY(90);
+	quayBase = Translate(0, 0, z) * Translate(0.23, 0, 0) * RotateY(-90);
 	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(0.23, 0, -1.2) * RotateY(90);
+	quayBase = Translate(0, 0, z) * Translate(0.23, 0, -1.2) * RotateY(-90);
 	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, -1.2) * RotateY(-90);
+	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, -1.2) * RotateY(90);
 	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, -2.4) * RotateY(-90);
+	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, -2.4) * RotateY(90);
 	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(0.23, 0, -2.4) * RotateY(90);
+	quayBase = Translate(0, 0, z) * Translate(0.23, 0, -2.4) * RotateY(-90);
 	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, -3.6) * RotateY(-90);
+	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, -3.6) * RotateY(90);
 	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(0.23, 0, -3.6) * RotateY(90);
-	caiBan();
-
-
-	quayBase = Translate(0, 0, z) * Translate(-1.8, 0, 0) * RotateY(90);
-	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(1.8, 0, 0) * RotateY(-90);
-	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -1.2) * RotateY(-90);
-	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(-1.8, 0, -1.2) * RotateY(90);
-	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(-1.8, 0, -2.4) * RotateY(90);
-	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -2.4) * RotateY(-90);
-	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(-1.8, 0, -3.6) * RotateY(90);
-	caiBan();
-	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -3.6) * RotateY(-90);
+	quayBase = Translate(0, 0, z) * Translate(0.23, 0, -3.6) * RotateY(-90);
 	caiBan();
 
+
+	quayBase = Translate(0, 0, z) * Translate(-1.8, 0, 0) * RotateY(-90);
+	caiBan();
+	quayBase = Translate(0, 0, z) * Translate(1.8, 0, 0) * RotateY(90);
+	caiBan();
+	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -1.2) * RotateY(90);
+	caiBan();
+	quayBase = Translate(0, 0, z) * Translate(-1.8, 0, -1.2) * RotateY(-90);
+	caiBan();
+	quayBase = Translate(0, 0, z) * Translate(-1.8, 0, -2.4) * RotateY(-90);
+	caiBan();
+	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -2.4) * RotateY(90);
+	caiBan();
+	quayBase = Translate(0, 0, z) * Translate(-1.8, 0, -3.6) * RotateY(-90);
+	caiBan();
+	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -3.6) * RotateY(90);
+	caiBan();
+	
 	//tu
-	quayBase = Translate(-2.5, 0.6, -6) * RotateY(180);
+	quayBase = Translate(0,0,z) * Translate(-2.5, 0.6, -6) * RotateY(180);
 	tu();
 
 	//tuong 
@@ -481,7 +485,7 @@ void canPhong() {
 	manChieu();
 
 	//ban giao vien
-	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -4.8) * RotateY(180);
+	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -4.8);
 	caiBan();
 
 	//maychieu
@@ -490,9 +494,6 @@ void canPhong() {
 
 	//cua chinh
 	quayBase = Translate(0, 0, z);
-	cuaChinh();
-	//cua phu
-	quayBase = Translate(0, 0, z) * Translate(0,0,5);
 	cuaChinh();
 
 	//cua so
@@ -505,9 +506,7 @@ void canPhong() {
 
 void display( void )
 {
-
     glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
-	
 	canPhong();
 	
 
@@ -523,7 +522,7 @@ void keyboard(unsigned char key, int x, int y)
 
 	switch (key) {
 
-	//quay cửa
+	//quay cửa - c
 	case 'c':
 		if (quayCuaChinh1 < 90)
 		quayCuaChinh1 += 5;
@@ -538,7 +537,7 @@ void keyboard(unsigned char key, int x, int y)
 		quayCuaChinh2 += 5;
 		break;
 
-	//quay cửa sổ
+	//quay cửa sổ - v
 	case 'v':
 		if (quayCuaSo1 < 90)
 			quayCuaSo1 += 5;
@@ -553,7 +552,7 @@ void keyboard(unsigned char key, int x, int y)
 			quayCuaSo2 += 5;
 		break;
 	
-	//kéo màn chiếu
+	//kéo màn chiếu - k
 	case 'k': {
 		if (!checkkeo) {
 			keo += 0.02;
@@ -572,7 +571,7 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	}
 
-	//kéo ghế
+	//kéo ghế - h
 	case 'h': {
 		if (!checkkeoghe) {
 			keoghe -= 0.02;
@@ -591,7 +590,7 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	}
 
-	//mở tủ
+	//mở tủ - 1-8
 	case '1': {
 
 		if (!checkMoTu[0]) {
@@ -608,7 +607,6 @@ void keyboard(unsigned char key, int x, int y)
 				checkMoTu[0] = false;
 			}
 		}
-		glutPostRedisplay();
 		break;
 	}
 	case '2': {
@@ -626,7 +624,6 @@ void keyboard(unsigned char key, int x, int y)
 				checkMoTu[1] = false;
 			}
 		}
-		glutPostRedisplay();
 		break;
 	}
 	case '3': {
@@ -644,7 +641,6 @@ void keyboard(unsigned char key, int x, int y)
 				checkMoTu[2] = false;
 			}
 		}
-		glutPostRedisplay();
 		break;
 	}
 	case '4': {
@@ -662,7 +658,6 @@ void keyboard(unsigned char key, int x, int y)
 				checkMoTu[3] = false;
 			}
 		}
-		glutPostRedisplay();
 		break;
 	}
 	case '5': {
@@ -680,7 +675,6 @@ void keyboard(unsigned char key, int x, int y)
 				checkMoTu[4] = false;
 			}
 		}
-		glutPostRedisplay();
 		break;
 	}
 	case '6': {
@@ -698,7 +692,6 @@ void keyboard(unsigned char key, int x, int y)
 				checkMoTu[5] = false;
 			}
 		}
-		glutPostRedisplay();
 		break;
 	}
 	case '7': {
@@ -716,7 +709,6 @@ void keyboard(unsigned char key, int x, int y)
 				checkMoTu[6] = false;
 			}
 		}
-		glutPostRedisplay();
 		break;
 	}
 	case '8': {
@@ -734,7 +726,6 @@ void keyboard(unsigned char key, int x, int y)
 				checkMoTu[7] = false;
 			}
 		}
-		glutPostRedisplay();
 		break;
 	}
 
