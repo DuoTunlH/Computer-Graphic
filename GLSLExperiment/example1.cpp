@@ -20,7 +20,7 @@ const int NumPoints = 36;
 
 point4 points[NumPoints]; /* Danh sách các đỉnh của các tam giác cần vẽ*/
 color4 colors[NumPoints]; /* Danh sách các màu tương ứng cho các đỉnh trên*/
-
+vec3 normals[NumPoints]; /*Danh sách các vector pháp tuyến ứng với mỗi đỉnh*/
 
 point4 vertices[8]; /* Danh sách 8 đỉnh của hình lập phương*/
 color4 vertex_colors[8]; /*Danh sách các màu tương ứng cho 8 đỉnh hình lập phương*/
@@ -28,14 +28,16 @@ color4 vertex_colors[8]; /*Danh sách các màu tương ứng cho 8 đỉnh hìn
 GLuint program;
 GLuint loc_modelMatrix;
 GLuint loc_projection;
+GLuint view_loc;
 GLfloat l = -1.0, r = 1.0, t = 1.0, b = -1.0, zNear = 0.5, zFar = 6;
 GLfloat radius = 1, thetal = 180, phi = 0;
-GLfloat dr = 5 * M_PI / 180;  
-GLfloat theta[] = { 0,0,0 };
+GLfloat dr = 5.0 * M_PI / 180;  
+GLfloat theta[3] = { 0,0,0 };
 
 
 mat4 model;
 mat4 quayBase;
+
 
 void initCube()
 {
@@ -62,12 +64,16 @@ void initCube()
 int Index = 0;
 void quad(int a, int b, int c, int d)  /*Tạo một mặt hình lập phương = 2 tam giác, gán màu cho mỗi đỉnh tương ứng trong mảng colors*/
 {
-	colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
-	colors[Index] = vertex_colors[b]; points[Index] = vertices[b]; Index++;
-	colors[Index] = vertex_colors[c]; points[Index] = vertices[c]; Index++;
-	colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
-	colors[Index] = vertex_colors[c]; points[Index] = vertices[c]; Index++;
-	colors[Index] = vertex_colors[d]; points[Index] = vertices[d]; Index++;
+	vec4 u = vertices[b] - vertices[a];
+	vec4 v = vertices[c] - vertices[b];
+	vec3 normal = normalize(cross(u, v));
+
+	normals[Index] = normal; colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
+	normals[Index] = normal; colors[Index] = vertex_colors[a]; points[Index] = vertices[b]; Index++;
+	normals[Index] = normal; colors[Index] = vertex_colors[a]; points[Index] = vertices[c]; Index++;
+	normals[Index] = normal; colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
+	normals[Index] = normal; colors[Index] = vertex_colors[a]; points[Index] = vertices[c]; Index++;
+	normals[Index] = normal; colors[Index] = vertex_colors[a]; points[Index] = vertices[d]; Index++;
 }
 void makeColorCube(void)  /* Sinh ra 12 tam giác: 36 đỉnh, 36 màu*/
 
@@ -97,14 +103,29 @@ void initGPUBuffers( void )
     GLuint buffer;
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(points)+sizeof(colors), NULL, GL_STATIC_DRAW );
+    //glBufferData( GL_ARRAY_BUFFER, sizeof(points)+sizeof(colors), NULL, GL_STATIC_DRAW );
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors) + sizeof(normals), NULL, GL_STATIC_DRAW);
+
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(points), points);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors); 
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors), sizeof(normals), normals);
 	
 }
+/* Khởi tạo các tham số chiếu sáng - tô bóng*/
+point4 light_position(0.0, 0.0, 1.0, 0.0);
+color4 light_ambient(0.2, 0.2, 0.2, 1.0);
+color4 light_diffuse(1.0, 1.0, 1.0, 1.0);
+color4 light_specular(1.0, 1.0, 1.0, 1.0);
 
+color4 material_ambient(1.0, 1.0, 1.0, 1.0);
+color4 material_diffuse(1.0, 0.8, 0.0, 1.0);
+color4 material_specular(1.0, 0.8, 0.0, 1.0);
+float material_shininess = 100.0;
 
+color4 ambient_product = light_ambient * material_ambient;
+color4 diffuse_product = light_diffuse * material_diffuse;
+color4 specular_product = light_specular * material_specular;
 void shaderSetup( void )
 {
 	// Nạp các shader và sử dụng chương trình shader
@@ -120,37 +141,63 @@ void shaderSetup( void )
 	glEnableVertexAttribArray(loc_vColor);
 	glVertexAttribPointer(loc_vColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points)));
 
+	GLuint loc_vNormal = glGetAttribLocation(program, "vNormal");
+	glEnableVertexAttribArray(loc_vNormal);
+	glVertexAttribPointer(loc_vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points) + sizeof(colors)));
+
+	glUniform4fv(glGetUniformLocation(program, "AmbientProduct"), 1, ambient_product);
+	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product);
+	glUniform4fv(glGetUniformLocation(program, "SpecularProduct"), 1, specular_product);
+	glUniform4fv(glGetUniformLocation(program, "LightPosition"), 1, light_position);
+	glUniform1f(glGetUniformLocation(program, "Shininess"), material_shininess);
+
 	loc_modelMatrix = glGetUniformLocation(program, "modelMatrix");
-	loc_projection = glGetUniformLocation(program, "projection");
+	loc_projection = glGetUniformLocation(program, "Projection");
+	view_loc = glGetUniformLocation(program, "View");
 	glEnable(GL_DEPTH_TEST);
 
     glClearColor( 1.0, 1.0, 1.0, 1.0 );        /* Thiết lập màu trắng là màu xóa màn hình*/
 }
 
 GLfloat z,x;
+vec4 mautu = vec4(1.0, 0.0, 0.0, 1.0);
+vec4 maucuatu = vec4(1.0, 1.0, 0.0, 1.0);
+vec4 maumaychieu = vec4(1.0, 0.0, 1.0, 1.0);
+vec4 maubang = vec4(0.0, 0.0, 0.0, 1.0);
+vec4 maumanchieu = vec4(1.0, 1.0, 1.0, 1.0);
+vec4 maucua = vec4(1.0, 1.0, 0.0, 1.0);
+vec4 maubanghe = vec4(1.0, 0.0, 0.0, 1.0);
+vec4 maumaytinh = vec4(0.0, 1.0, 0.0, 1.0);
+vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
 
-void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt) {
+void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
+	
+	material_diffuse = colorCode;
+	diffuse_product = light_diffuse * material_diffuse;
+
+	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product); 
+
 	point4 eye(0, 1, 1, 1.0);
 	point4 at(sin(thetal), 1, 1 + cos(thetal), 1.0);
-	
 	vec4 up(0, 1, 0, 1.0);
 
 	mat4 v = LookAt(eye, at, up);
+	glUniformMatrix4fv(view_loc, 1, GL_TRUE, v);
 	mat4 ins = Scale(x,y,z);
-	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, v*quayBase*mt*ins);
+	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase*mt*ins);
 
 	mat4 p = Frustum(l, r, b, t, zNear, zFar);
 	glUniformMatrix4fv(loc_projection, 1, GL_TRUE, p);
-	glDrawArrays(GL_TRIANGLES, 0, NumPoints);
+	glDrawArrays(GL_TRIANGLES, 0, NumPoints); 
 }
 
 void truMayChieu() {
 	model = Translate(0, 0.25, 0);
-	matPhang(0.2, 0.5, 0.2, model);
+	matPhang(0.2, 0.5, 0.2, model, maumaychieu);
 }
 void hopMayChieu() {
 	model = Translate(-0.5 * 0.025, 0, 0);
-	matPhang(0.6, 0.05, 0.2, model);
+	matPhang(0.6, 0.05, 0.2, model, maumaychieu);
 }
 
 GLfloat wM = 1.5, hM = 2.5, dM = 0.05;
@@ -160,9 +207,9 @@ bool checkkeo = false;
 
 void manChieu() {
 	model = Translate(0, 0.5 * keo, -6.8 ) * RotateY(180);
-	matPhang(wM, hM - keo, dM, model);
+	matPhang(wM, hM - keo, dM, model, maumanchieu);
 	model = Translate(0, 0.5 * hM + 0.5 * hTN, -6.8) * RotateY(180);
-	matPhang(wTN, hTN, dTN, model);
+	matPhang(wTN, hTN, dTN, model, maumanchieu);
 
 }
 
@@ -175,82 +222,82 @@ void mayChieu() {
 
 void matBan() {
 	model = Translate(0, 0.3, 0);
-	matPhang(0.8, 0.02, 0.4, model);
+	matPhang(0.8, 0.02, 0.4, model, maubanghe);
 }
 
 void chanBan() {
 	//chan 1
 	model = Translate(-0.375,-0.01,-0.2);
-	matPhang(0.02, 0.6, 0.02, model);
+	matPhang(0.02, 0.6, 0.02, model, maubanghe);
 
 	//chan 2
 	model = Translate(-0.375, -0.01, 0.2);
-	matPhang(0.02, 0.6, 0.02, model);
+	matPhang(0.02, 0.6, 0.02, model, maubanghe);
 
 	//chan 3
 	model = Translate(0.375, -0.01, -0.2);
-	matPhang(0.02, 0.6, 0.02, model);
+	matPhang(0.02, 0.6, 0.02, model, maubanghe);
 
 	//chan 4
 	model = Translate(0.375, -0.01, 0.2);
-	matPhang(0.02, 0.6, 0.02, model);
+	matPhang(0.02, 0.6, 0.02, model, maubanghe);
 
 	//thang doc 1
 	model = Translate(-0.375, -0.24, 0);
-	matPhang(0.02, 0.02, 0.4, model);
+	matPhang(0.02, 0.02, 0.4, model, maubanghe);
 
 	//thanh doc 2
 	model = Translate(0.375, -0.24, 0);
-	matPhang(0.02, 0.02, 0.4, model);
+	matPhang(0.02, 0.02, 0.4, model, maubanghe);
 
 	//thanh ngang
 	model = Translate(0, -0.24, 0);
-	matPhang(0.78, 0.02, 0.02, model);
+	matPhang(0.78, 0.02, 0.02, model, maubanghe);
 
 	//hop may tinh
 	model = Translate(-0.2, 0.02, 0.05);
-	matPhang(0.2, 0.35, 0.4, model);
+	matPhang(0.2, 0.35, 0.4, model, maumaytinh);
 }
 
 void MayTinh() {
 	//De may tinh
 	model = Translate(0, 0.3, 0);
-	matPhang(0.3, 0.03, 0.02, model);
+	matPhang(0.3, 0.03, 0.02, model, maumaytinh);
 
 	//Than may tinh
 	model = Translate(0, 0.45, 0);
-	matPhang(0.05, 0.25, 0.02, model);
+	matPhang(0.05, 0.25, 0.02, model, maumaytinh);
 
 	//Man may tinh
 	model = Translate(0, 0.7, 0);
-	matPhang(0.35, 0.4, 0.04, model);
+	matPhang(0.35, 0.4, 0.04, model, maumaytinh);
 }
 
 GLfloat keoghe = 0;
 bool checkkeoghe = false;
 void matGhe() {
 	model = Translate(0, 0, -0.5 - keoghe);
-	matPhang(0.4, 0.02, 0.25, model);
+	matPhang(0.4, 0.02, 0.25, model, maubanghe);
 	model = Translate(0, 0.15, -0.62 - keoghe) * RotateX(90);
-	matPhang(0.4, 0.02, 0.25, model);
+	matPhang(0.4, 0.02, 0.25, model, maubanghe);
 }
 
 void chanGhe() {
 	//chan 1
 	model = Translate(-0.175, -0.15, -0.4 - keoghe);
-	matPhang(0.02, 0.3, 0.02, model);
+	matPhang(0.02, 0.3, 0.02, model, maubanghe);
 
 	//chan 2
 	model = Translate(-0.175, -0.15, -0.6 - keoghe);
-	matPhang(0.02, 0.3, 0.02, model);
+	matPhang(0.02, 0.3, 0.02, model, maubanghe);
 
 	//chan 3
 	model = Translate(0.175, -0.15, -0.4 - keoghe);
-	matPhang(0.02, 0.3, 0.02, model);
+	matPhang(0.02, 0.3, 0.02, model, maubanghe);
 
 	//chan 4
 	model = Translate(0.175, -0.15, -0.6 - keoghe);
-	matPhang(0.02, 0.3, 0.02, model);
+	matPhang(0.02, 0.3, 0.02, model, maubanghe);
 
 	
 }
@@ -275,33 +322,33 @@ GLfloat day = 0.02;
 void khungTu() {
 	//Mặt trái
 	model = Translate(-0.5 * widthTu - 0.5 * day, 0, 0);
-	matPhang(day, heighTu, widthTu, model);
+	matPhang(day, heighTu, widthTu, model, mautu);
 	//Mặt phải
 	model = Translate(0.5 * widthTu + 0.5 * day, 0, 0);
-	matPhang(day, heighTu, widthTu, model);
+	matPhang(day, heighTu, widthTu, model, mautu);
 	//Mặt trên
 	model = Translate(0, 0.5 * heighTu - 0.5 * day, 0);
-	matPhang(widthTu, day, widthTu, model);
+	matPhang(widthTu, day, widthTu, model, mautu);
 	//Mặt dưới
 	model = Translate(0, -0.5 * heighTu + 0.5 * day, 0);
-	matPhang(widthTu, day, widthTu, model);
+	matPhang(widthTu, day, widthTu, model, mautu);
 	// mặt sau
 	model = Translate(0, 0, 0.5 * widthTu - 0.5 * day);
-	matPhang(widthTu, heighTu, day, model);
+	matPhang(widthTu, heighTu, day, model, mautu);
 
 	// ngăn ngag tủ trên 
 	model = Translate(0, 0.25 * heighTu, 0);
-	matPhang(widthTu, day, widthTu, model);
+	matPhang(widthTu, day, widthTu, model, mautu);
 	// ngăn ngag tủ giữa 
 	model = Translate(0, 0, 0);
-	matPhang(widthTu, day, widthTu, model);
+	matPhang(widthTu, day, widthTu, model, mautu);
 	// ngăn ngag tủ dưới 
 	model = Translate(0, -0.25 * heighTu, 0);
-	matPhang(widthTu, day, widthTu, model);
+	matPhang(widthTu, day, widthTu, model, mautu);
 
 	// ngăn dọc giữa 
 	model = Translate(0, 0, 0);
-	matPhang(day, heighTu, widthTu, model);
+	matPhang(day, heighTu, widthTu, model, mautu);
 }
 GLfloat widthCT = 0.5 * widthTu;
 GLfloat heightCT = 0.25 * heighTu;
@@ -310,29 +357,29 @@ bool checkMoTu[8] = { false,false ,false,false,false,false,false,false };
 void cuaTu() {
 	// cửa 1 trái
 	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu[0]) * Translate(widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model);
+	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 2 trái
 	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu[1]) * Translate(widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model);
+	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 3 trái
 	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu[2]) * Translate(widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model);
+	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 4 trái
 	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu[3]) * Translate(widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model);
+	matPhang(widthCT, heightCT, day, model, maucuatu);
 
 	// cửa 1 phai
 	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu[4]) * Translate(-widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model);
+	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 2 phai
 	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu[5]) * Translate(-widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model);
+	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 3 phai
 	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu[6]) * Translate(-widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model);
+	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 4 phai
 	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu[7]) * Translate(-widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model);
+	matPhang(widthCT, heightCT, day, model, maucuatu);
 }
 void tu() {
 	khungTu();
@@ -342,31 +389,31 @@ void tu() {
 
 void tuongTrai() {
 	model = Translate(-3.25, 0.4, -0.35);
-	matPhang(0.02, 1.5, 6.8, model);
+	matPhang(0.02, 1.5, 6.8, model, mautuong);
 
 	model = Translate(-3.25, 0.4, -6.1);
-	matPhang(0.02, 1.5, 1.7, model);
+	matPhang(0.02, 1.5, 1.7, model, mautuong);
 
 	model = Translate(-3.26, 2.9, -1.95);
-	matPhang(0.02, 3.5, 10, model);
+	matPhang(0.02, 3.5, 10, model, mautuong);
 }
 
 void tuongPhai() {
 
 	model = Translate(3.25, 3.9, -1.95);
-	matPhang(0.02, 1.5, 10, model);
+	matPhang(0.02, 1.5, 10, model, mautuong);
 
 	model = Translate(3.25, 0.45, -1.95);
-	matPhang(0.02, 1.5, 10, model);
+	matPhang(0.02, 1.5, 10, model, mautuong);
 
 	model = Translate(3.25, 2.18, -6.4);
-	matPhang(0.02, 2, 1, model);
+	matPhang(0.02, 2, 1, model, mautuong);
 
 	model = Translate(3.25, 2.18, -1.95);
-	matPhang(0.02, 2, 1, model);
+	matPhang(0.02, 2, 1, model, mautuong);
 
 	model = Translate(3.25, 2.18, 2.55);
-	matPhang(0.02, 2, 1, model);
+	matPhang(0.02, 2, 1, model, mautuong);
 
 }
 
@@ -374,29 +421,29 @@ GLfloat quayCuaSo1 = 0, quayCuaSo2 = 0;
 void cuaSo() {
 	//canh cua 1 
 	model = Translate(3.25, 0, -5.9) * RotateY(quayCuaSo1) * Translate(0, 2.18, 0.5 * 1.75);
-	matPhang(0.02, 2, 1.75, model);
+	matPhang(0.02, 2, 1.75, model, maucua);
 
 	//canh cua 2 
 	model = Translate(3.25, 0, -2.45) * RotateY(180) * RotateY(quayCuaSo2) * Translate(0, 2.18, 0.5 * 1.75);
-	matPhang(0.02, 2, 1.75, model);
+	matPhang(0.02, 2, 1.75, model, maucua);
 }
 void tranNha() {
 	model = Translate(0, 4.68, -1.95);
-	matPhang(6.5, 0.02, 10, model);
+	matPhang(6.5, 0.02, 10, model, maucua);
 }
 void tuongSau() {
 	model = Translate(0, 2.2, -6.9);
-	matPhang(6.5, 5, 0.02, model);
+	matPhang(6.5, 5, 0.02, model, maucua);
 }
 void san() {
 	model = Translate(0, -0.31, -1.95);
-	matPhang(6.5, 0.02, 10, model);
+	matPhang(6.5, 0.02, 10, model, mautuong);
 }
 
 
 void bang() {
 	model = Translate(0, 2.2, -6.85) * RotateY(180);
-	matPhang(3, 3, 0.02, model);
+	matPhang(3, 3, 0.02, model, maubang);
 }
 
 GLfloat quayCuaChinh1 = 0, quayCuaChinh2 = 0;
@@ -405,11 +452,11 @@ void cuaChinh() {
 
 	//canh cua 1 
 	model =  Translate(-3.25,0,-5.25) * RotateY(quayCuaChinh1) * Translate(0, 0.4, 0.5 * 0.75);
-	matPhang(0.02, 1.5, 0.75, model);
+	matPhang(0.02, 1.5, 0.75, model, maucua);
 
 	//canh cua 2 
 	model =  Translate(-3.25, 0, -3.75)* RotateY(180)  * RotateY(quayCuaChinh2) * Translate(0, 0.4, 0.5 * 0.75);
-	matPhang(0.02, 1.5, 0.75, model);
+	matPhang(0.02, 1.5, 0.75, model, maucua);
 }
 
 
@@ -506,6 +553,7 @@ void canPhong() {
 
 void display( void )
 {
+	const vec3 viewer_pos(0, 1, 1);
     glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
 	canPhong();
 	
@@ -521,7 +569,6 @@ void keyboard(unsigned char key, int x, int y)
 	// keyboard handler
 
 	switch (key) {
-
 	//quay cửa - c
 	case 'c':
 		if (quayCuaChinh1 < 90)
@@ -757,10 +804,13 @@ void keyboard(unsigned char key, int x, int y)
 		b = -1.0;
 		t = 1.0;
 		zNear = 0.5;
-		zFar = 3.0;
+		zFar = 6.0;
 		radius = 1.0;
 		thetal = 0.0;
 		phi = 0.0;
+		theta[0] = 0;
+		theta[1] = 0;
+		theta[2] = 0;
 		break;
 	}
 	glutPostRedisplay();
