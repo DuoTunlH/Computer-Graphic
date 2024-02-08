@@ -160,8 +160,8 @@ void shaderSetup( void )
 }
 
 GLfloat z,x;
-vec4 mautu = vec4(1.0, 0.0, 0.0, 1.0);
-vec4 maucuatu = vec4(1.0, 1.0, 0.0, 1.0);
+vec4 mautu = vec4(0.5, 0.5, 0.5, 1.0);
+vec4 maucuatu = vec4(0.8,0.8,0.8, 1.0);
 vec4 maumaychieu = vec4(1.0, 0.0, 1.0, 1.0);
 vec4 maubang = vec4(0.0, 0.0, 0.0, 1.0);
 vec4 maumanchieu = vec4(1.0, 1.0, 1.0, 1.0);
@@ -499,7 +499,7 @@ void canPhong() {
 	caiBan();
 	
 	//tu
-	quayBase = Translate(0,0,z) * Translate(-2.5, 0.6, -6) * RotateY(180);
+	quayBase = Translate(0,0,z) * Translate(-2.5, 0.6, -6.4) * RotateY(180);
 	tu();
 
 	//tuong 
