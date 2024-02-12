@@ -169,6 +169,7 @@ vec4 maucua = vec4(1.0, 1.0, 0.0, 1.0);
 vec4 maubanghe = vec4(1.0, 0.0, 0.0, 1.0);
 vec4 maumaytinh = vec4(0.0, 1.0, 0.0, 1.0);
 vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
+vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
 
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 	
@@ -315,8 +316,16 @@ void caiBan() {
 	caiGhe();
 }
 
+void banGiaoVien() {
+	matBan();
+	chanBan();
+	caiGhe();
+	quayBase *= RotateY(20)*Translate(0.25,0,0.15);
+	MayTinh();
+}
+
 GLfloat heighTu = 1.8;
-GLfloat widthTu = 0.8;
+GLfloat widthTu = 0.6;
 GLfloat day = 0.02;
 
 void khungTu() {
@@ -338,17 +347,17 @@ void khungTu() {
 
 	// ngăn ngag tủ trên 
 	model = Translate(0, 0.25 * heighTu, 0);
-	matPhang(widthTu, day, widthTu, model, mautu);
+	matPhang(widthTu, day+0.02, widthTu, model, mautu);
 	// ngăn ngag tủ giữa 
 	model = Translate(0, 0, 0);
-	matPhang(widthTu, day, widthTu, model, mautu);
+	matPhang(widthTu, day + 0.02, widthTu, model, mautu);
 	// ngăn ngag tủ dưới 
 	model = Translate(0, -0.25 * heighTu, 0);
-	matPhang(widthTu, day, widthTu, model, mautu);
+	matPhang(widthTu, day + 0.02, widthTu, model, mautu);
 
 	// ngăn dọc giữa 
 	model = Translate(0, 0, 0);
-	matPhang(day, heighTu, widthTu, model, mautu);
+	matPhang(day + 0.02, heighTu, widthTu, model, mautu);
 }
 GLfloat widthCT = 0.5 * widthTu;
 GLfloat heightCT = 0.25 * heighTu;
@@ -400,32 +409,41 @@ void tuongTrai() {
 
 void tuongPhai() {
 
-	model = Translate(3.25, 3.9, -1.95);
-	matPhang(0.02, 1.5, 10, model, mautuong);
+	model = Translate(3.25, 3.3, -1.95);
+	matPhang(0.02, 2.65, 10, model, mautuong);
 
-	model = Translate(3.25, 0.45, -1.95);
-	matPhang(0.02, 1.5, 10, model, mautuong);
+	model = Translate(3.25, 0.35, -1.95);
+	matPhang(0.02, 1.3, 10, model, mautuong);
 
-	model = Translate(3.25, 2.18, -6.4);
-	matPhang(0.02, 2, 1, model, mautuong);
+	model = Translate(3.25, 1.5, -5.97);
+	matPhang(0.02, 1, 1.95, model, mautuong);
 
-	model = Translate(3.25, 2.18, -1.95);
-	matPhang(0.02, 2, 1, model, mautuong);
+	model = Translate(3.25, 1.5, -3.15);
+	matPhang(0.02, 1, 2.3, model, mautuong);
 
-	model = Translate(3.25, 2.18, 2.55);
-	matPhang(0.02, 2, 1, model, mautuong);
+	model = Translate(3.25, 1.5, -0.15);
+	matPhang(0.02, 1, 2.3, model, mautuong);
 
+	model = Translate(3.25, 1.5, 2.35);
+	matPhang(0.02, 1, 1.32, model, mautuong);
 }
 
-GLfloat quayCuaSo1 = 0, quayCuaSo2 = 0;
-void cuaSo() {
-	//canh cua 1 
-	model = Translate(3.25, 0, -5.9) * RotateY(quayCuaSo1) * Translate(0, 2.18, 0.5 * 1.75);
-	matPhang(0.02, 2, 1.75, model, maucua);
+GLfloat quayCuaSo;
 
-	//canh cua 2 
-	model = Translate(3.25, 0, -2.45) * RotateY(180) * RotateY(quayCuaSo2) * Translate(0, 2.18, 0.5 * 1.75);
-	matPhang(0.02, 2, 1.75, model, maucua);
+void cuaSo() {
+	//khung doc
+	model = Translate(0, 0, 0);
+	matPhang(0.04, 1, 0.03, model, mautu);
+	model = Translate(0, 0, 0.7);
+	matPhang(0.04, 1, 0.03, model, mautu);
+	//khung ngang
+	model = Translate(0, 0.5, 0.35);
+	matPhang(0.04, 0.04, 0.72, model, mautu);
+	model = Translate(0, -0.5, 0.35);
+	matPhang(0.04, 0.04, 0.72, model, mautu);
+	//cua kinh
+	model = Translate(0, 0.5, 0) * RotateZ(quayCuaSo) * Translate(0, -0.5, 0) * Translate(0, 0, 0.35);
+	matPhang(0.02, 1, 0.7, model, mautrang);
 }
 void tranNha() {
 	model = Translate(0, 4.68, -1.95);
@@ -449,7 +467,6 @@ void bang() {
 GLfloat quayCuaChinh1 = 0, quayCuaChinh2 = 0;
 
 void cuaChinh() {
-
 	//canh cua 1 
 	model =  Translate(-3.25,0,-5.25) * RotateY(quayCuaChinh1) * Translate(0, 0.4, 0.5 * 0.75);
 	matPhang(0.02, 1.5, 0.75, model, maucua);
@@ -499,7 +516,7 @@ void canPhong() {
 	caiBan();
 	
 	//tu
-	quayBase = Translate(0,0,z) * Translate(-2.5, 0.6, -6.4) * RotateY(180);
+	quayBase = Translate(0,0,z) * Translate(-2.8, 0.6, -6.5) * RotateY(180);
 	tu();
 
 	//tuong 
@@ -533,7 +550,7 @@ void canPhong() {
 
 	//ban giao vien
 	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -4.8);
-	caiBan();
+	banGiaoVien();
 
 	//maychieu
 	quayBase = Translate(0, 0, z) * Translate(0.28, 4, -2.25);
@@ -544,9 +561,11 @@ void canPhong() {
 	cuaChinh();
 
 	//cua so
-	quayBase = Translate(0, 0, z);
+	quayBase = Translate(0, 0, z) * Translate(3.25,1.5,1);
 	cuaSo();
-	quayBase = Translate(0, 0, z) * Translate(0,0,4.48);
+	quayBase = Translate(0, 0, z) * Translate(3.25, 1.5, -2);
+	cuaSo();
+	quayBase = Translate(0, 0, z) * Translate(3.25, 1.5, -5);
 	cuaSo();
 	
 }
@@ -586,17 +605,13 @@ void keyboard(unsigned char key, int x, int y)
 
 	//quay cửa sổ - v
 	case 'v':
-		if (quayCuaSo1 < 90)
-			quayCuaSo1 += 5;
-		if (quayCuaSo2 > -90)
-			quayCuaSo2 -= 5;
+		if (quayCuaSo < 45)
+			quayCuaSo += 5;
 		break;
 
 	case 'V':
-		if (quayCuaSo1 > 0)
-			quayCuaSo1 -= 5;
-		if (quayCuaSo2 < 0)
-			quayCuaSo2 += 5;
+		if (quayCuaSo > 0)
+			quayCuaSo -= 5;
 		break;
 	
 	//kéo màn chiếu - k
