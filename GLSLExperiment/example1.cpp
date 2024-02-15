@@ -211,7 +211,6 @@ void manChieu() {
 	matPhang(wM, hM - keo, dM, model, maumanchieu);
 	model = Translate(0, 0.5 * hM + 0.5 * hTN, -6.8) * RotateY(180);
 	matPhang(wTN, hTN, dTN, model, maumanchieu);
-
 }
 
 
@@ -316,12 +315,59 @@ void caiBan() {
 	caiGhe();
 }
 
+GLfloat quayLaptop = 0;
+int laptopState = 0;
+bool isLaptopOpen = true;
+
+void laptop() {	
+	//than duoi
+	model = Translate(0, 0, 0);
+	matPhang(0.6, 0.02, 0.5, model, mautu);
+
+	//banphim
+	model = Translate(0, 0.009, -0.03);
+	matPhang(0.5, 0.005, 0.25, model, mautrang);
+
+	//touchpad
+	model = Translate(0, 0.009, 0.18);
+	matPhang(0.25, 0.005, 0.09, model, mautrang);
+
+	quayBase *= Translate(0, 0.02, -0.25) * RotateX(quayLaptop) * Translate(0, -0.02, 0.25);
+
+	//than tren thanh doc
+	model = Translate(-0.2925, 0.25, -0.25);
+	matPhang(0.015, 0.5, 0.015, model, mautu);
+
+	model = Translate(0.2925, 0.25, -0.25);
+	matPhang(0.015, 0.5, 0.015, model, mautu);
+
+	//than tren thanh ngang
+	model = Translate(0, 0.025, -0.25);
+	matPhang(0.6, 0.05, 0.01, model, mautu);
+
+	model = Translate(0, 0.515, -0.25);
+	matPhang(0.6, 0.03, 0.01, model, mautu);
+
+	//man hinh
+	vec4 mauManHinh = isLaptopOpen ? mautuong: vec4(0, 0, 0, 0);
+	model = Translate(0, 0.28, -0.25);
+	matPhang(0.57, 0.45, 0.005, model, mauManHinh);
+
+	model = Translate(0, 0.28, -0.255);
+	matPhang(0.57, 0.455, 0.001, model, mautu);
+}
+
 void banGiaoVien() {
 	matBan();
 	chanBan();
 	caiGhe();
+	mat4 tmpQuayBase = quayBase;
+	quayBase *= Translate(-0.2, 0.35, 0) * RotateY(180) * Scale(0.5, 0.5, 0.5);
+	laptop();
+	quayBase = tmpQuayBase;
 	quayBase *= RotateY(20)*Translate(0.25,0,0.15);
 	MayTinh();
+	
 }
 
 GLfloat heighTu = 1.8;
@@ -361,33 +407,33 @@ void khungTu() {
 }
 GLfloat widthCT = 0.5 * widthTu;
 GLfloat heightCT = 0.25 * heighTu;
-GLfloat MoTu[8] = { 0,0,0,0,0,0,0,0 };
-bool checkMoTu[8] = { false,false ,false,false,false,false,false,false };
+GLfloat MoTu = 0;
+int tuState = 0;
 void cuaTu() {
 	// cửa 1 trái
-	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu[0]) * Translate(widthCT * 0.5, 0, 0);
+	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 2 trái
-	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu[1]) * Translate(widthCT * 0.5, 0, 0);
+	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 3 trái
-	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu[2]) * Translate(widthCT * 0.5, 0, 0);
+	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 4 trái
-	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu[3]) * Translate(widthCT * 0.5, 0, 0);
+	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT, day, model, maucuatu);
 
 	// cửa 1 phai
-	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu[4]) * Translate(-widthCT * 0.5, 0, 0);
+	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 2 phai
-	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu[5]) * Translate(-widthCT * 0.5, 0, 0);
+	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 3 phai
-	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu[6]) * Translate(-widthCT * 0.5, 0, 0);
+	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT, day, model, maucuatu);
 	// cửa 4 phai
-	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu[7]) * Translate(-widthCT * 0.5, 0, 0);
+	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT, day, model, maucuatu);
 }
 void tu() {
@@ -429,7 +475,7 @@ void tuongPhai() {
 }
 
 GLfloat quayCuaSo;
-
+int cuaSoState = 0;
 void cuaSo() {
 	//khung doc
 	model = Translate(0, 0, 0);
@@ -475,9 +521,6 @@ void cuaChinh() {
 	model =  Translate(-3.25, 0, -3.75)* RotateY(180)  * RotateY(quayCuaChinh2) * Translate(0, 0.4, 0.5 * 0.75);
 	matPhang(0.02, 1.5, 0.75, model, maucua);
 }
-
-
-
 
 void canPhong() {
 	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, 0) * RotateY(90);
@@ -574,13 +617,67 @@ void display( void )
 {
 	const vec3 viewer_pos(0, 1, 1);
     glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
-	canPhong();
-	
-
-        /*Vẽ các tam giác*/
+	canPhong();	
 	glutSwapBuffers();									   
 }
 
+
+void molaptop(int value) {
+	if (laptopState == 0) {
+		if (quayLaptop == 90) {
+			laptopState = 1;
+			return;
+		}
+		quayLaptop += 5;
+	}
+	if (laptopState == 1) {
+		if (quayLaptop == -5) {
+			laptopState = 0;
+			return;
+		}
+		quayLaptop -= 5;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, molaptop, 0);
+}
+
+void motu(int value) {
+	if (tuState == 0) {
+		if (MoTu == 100) {
+			tuState = 1;
+			return;
+		}
+		MoTu += 5;
+	}
+	if (tuState == 1) {
+		if (MoTu == 0) {
+			tuState = 0;
+			return;
+		}
+		MoTu -= 5;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, motu, 0);
+}
+
+void moCuaso(int value) {
+	if (cuaSoState == 0) {
+		if (quayCuaSo == 45) {
+			cuaSoState = 1;
+			return;
+		}
+		quayCuaSo += 5;
+	}
+	if (cuaSoState == 1) {
+		if (quayCuaSo == 0) {
+			cuaSoState = 0;
+			return;
+		}
+		quayCuaSo -= 5;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, moCuaso, 0);
+}
 
 
 void keyboard(unsigned char key, int x, int y)
@@ -591,29 +688,34 @@ void keyboard(unsigned char key, int x, int y)
 	//quay cửa - c
 	case 'c':
 		if (quayCuaChinh1 < 90)
-		quayCuaChinh1 += 5;
+			quayCuaChinh1 += 5;
 		if (quayCuaChinh2 > -90)
-		quayCuaChinh2 -= 5;
+			quayCuaChinh2 -= 5;
 		break;
 
 	case 'C':
 		if (quayCuaChinh1 > 0)
-		quayCuaChinh1 -= 5;
+			quayCuaChinh1 -= 5;
 		if (quayCuaChinh2 < 0)
-		quayCuaChinh2 += 5;
+			quayCuaChinh2 += 5;
 		break;
 
-	//quay cửa sổ - v
+	//mo cua so - v
 	case 'v':
-		if (quayCuaSo < 45)
-			quayCuaSo += 5;
+		moCuaso(cuaSoState);
 		break;
-
-	case 'V':
-		if (quayCuaSo > 0)
-			quayCuaSo -= 5;
+	//mo tu - o
+	case 'o':
+		motu(tuState);
 		break;
-	
+	//gap laptop - l
+	case 'l':
+		molaptop(laptopState);
+		break;
+	//mo laptop - p
+	case 'i':
+		isLaptopOpen = !isLaptopOpen;
+		break;
 	//kéo màn chiếu - k
 	case 'k': {
 		if (!checkkeo) {
@@ -652,144 +754,6 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	}
 
-	//mở tủ - 1-8
-	case '1': {
-
-		if (!checkMoTu[0]) {
-			MoTu[0] += 5;
-			if (MoTu[0] > 90) {
-				MoTu[0] = 90;
-				checkMoTu[0] = true;
-			}
-		}
-		else {
-			MoTu[0] -= 5;
-			if (MoTu[0] < 0) {
-				MoTu[0] = 0;
-				checkMoTu[0] = false;
-			}
-		}
-		break;
-	}
-	case '2': {
-		if (!checkMoTu[1]) {
-			MoTu[1] += 5;
-			if (MoTu[1] > 90) {
-				MoTu[1] = 90;
-				checkMoTu[1] = true;
-			}
-		}
-		else {
-			MoTu[1] -= 5;
-			if (MoTu[1] < 0) {
-				MoTu[1] = 0;
-				checkMoTu[1] = false;
-			}
-		}
-		break;
-	}
-	case '3': {
-		if (!checkMoTu[2]) {
-			MoTu[2] += 5;
-			if (MoTu[2] > 90) {
-				MoTu[2] = 90;
-				checkMoTu[2] = true;
-			}
-		}
-		else {
-			MoTu[2] -= 5;
-			if (MoTu[2] < 0) {
-				MoTu[2] = 0;
-				checkMoTu[2] = false;
-			}
-		}
-		break;
-	}
-	case '4': {
-		if (!checkMoTu[3]) {
-			MoTu[3] += 5;
-			if (MoTu[3] > 90) {
-				MoTu[3] = 90;
-				checkMoTu[3] = true;
-			}
-		}
-		else {
-			MoTu[3] -= 5;
-			if (MoTu[3] < 0) {
-				MoTu[3] = 0;
-				checkMoTu[3] = false;
-			}
-		}
-		break;
-	}
-	case '5': {
-		if (!checkMoTu[4]) {
-			MoTu[4] += 5;
-			if (MoTu[4] > 90) {
-				MoTu[4] = 90;
-				checkMoTu[4] = true;
-			}
-		}
-		else {
-			MoTu[4] -= 5;
-			if (MoTu[4] < 0) {
-				MoTu[4] = 0;
-				checkMoTu[4] = false;
-			}
-		}
-		break;
-	}
-	case '6': {
-		if (!checkMoTu[5]) {
-			MoTu[5] += 5;
-			if (MoTu[5] > 90) {
-				MoTu[5] = 90;
-				checkMoTu[5] = true;
-			}
-		}
-		else {
-			MoTu[5] -= 5;
-			if (MoTu[5] < 0) {
-				MoTu[5] = 0;
-				checkMoTu[5] = false;
-			}
-		}
-		break;
-	}
-	case '7': {
-		if (!checkMoTu[6]) {
-			MoTu[6] += 5;
-			if (MoTu[6] > 90) {
-				MoTu[6] = 90;
-				checkMoTu[6] = true;
-			}
-		}
-		else {
-			MoTu[6] -= 5;
-			if (MoTu[6] < 0) {
-				MoTu[6] = 0;
-				checkMoTu[6] = false;
-			}
-		}
-		break;
-	}
-	case '8': {
-		if (!checkMoTu[7]) {
-			MoTu[7] += 5;
-			if (MoTu[7] > 90) {
-				MoTu[7] = 90;
-				checkMoTu[7] = true;
-			}
-		}
-		else {
-			MoTu[7] -= 5;
-			if (MoTu[7] < 0) {
-				MoTu[7] = 0;
-				checkMoTu[7] = false;
-			}
-		}
-		break;
-	}
 
 
 	case 'd': thetal -= 0.1; break;
