@@ -412,29 +412,29 @@ int tuState = 0;
 void cuaTu() {
 	// cửa 1 trái
 	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model, maucuatu);
+	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
 	// cửa 2 trái
 	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model, maucuatu);
+	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
 	// cửa 3 trái
 	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model, maucuatu);
+	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
 	// cửa 4 trái
 	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model, maucuatu);
+	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
 
 	// cửa 1 phai
 	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model, maucuatu);
+	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
 	// cửa 2 phai
 	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model, maucuatu);
+	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
 	// cửa 3 phai
 	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model, maucuatu);
+	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
 	// cửa 4 phai
 	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
-	matPhang(widthCT, heightCT, day, model, maucuatu);
+	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
 }
 void tu() {
 	khungTu();
