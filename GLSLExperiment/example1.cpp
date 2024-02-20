@@ -171,6 +171,7 @@ vec4 maumaytinh = vec4(0.0, 1.0, 0.0, 1.0);
 vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
 vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
 
+GLfloat xcam, ycam, zcam;
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 	
 	material_diffuse = colorCode;
@@ -178,8 +179,8 @@ void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 
 	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product); 
 
-	point4 eye(0, 1, 1, 1.0);
-	point4 at(sin(thetal), 1, 1 + cos(thetal), 1.0);
+	point4 eye(xcam, 1, zcam, 1.0);
+	point4 at(sin(thetal) + xcam, 1, 1 + cos(thetal) + zcam, 1.0);
 	vec4 up(0, 1, 0, 1.0);
 
 	mat4 v = LookAt(eye, at, up);
@@ -679,6 +680,24 @@ void moCuaso(int value) {
 	glutTimerFunc(100, moCuaso, 0);
 }
 
+void camera_movement(unsigned char key) {
+	switch (key) {
+	case 'd': xcam -= 0.1; break;
+	case 'a': xcam += 0.1; break;
+	case 'w': zcam += 0.1; break;
+	case 's': zcam -= 0.1; break;
+	}
+}
+
+
+void camera_direction(int key, int a, int b) {
+	switch (key) {
+	case GLUT_KEY_LEFT: thetal -= 0.1; break;
+	case GLUT_KEY_RIGHT: thetal += 0.1; break;
+	}
+	glutPostRedisplay();
+}
+
 
 void keyboard(unsigned char key, int x, int y)
 {
@@ -756,10 +775,10 @@ void keyboard(unsigned char key, int x, int y)
 
 
 
-	case 'd': thetal -= 0.1; break;
-	case 'a': thetal += 0.1; break;
-	case 'w': z += 0.1; break;
-	case 's': z -= 0.1; break;
+	//case 'd': thetal -= 0.1; break;
+	//case 'a': thetal += 0.1; break;
+	//case 'w': z += 0.1; break;
+	//case 's': z -= 0.1; break;
 
 	
 
@@ -787,11 +806,13 @@ void keyboard(unsigned char key, int x, int y)
 		radius = 1.0;
 		thetal = 0.0;
 		phi = 0.0;
-		theta[0] = 0;
-		theta[1] = 0;
-		theta[2] = 0;
+		//theta[0] = 0;
+		//theta[1] = 0;
+		//theta[2] = 0;
 		break;
 	}
+
+	camera_movement(key);
 	glutPostRedisplay();
 }
 
@@ -813,7 +834,8 @@ int main( int argc, char **argv )
     initGPUBuffers( );							   
     shaderSetup( );                               
 
-    glutDisplayFunc( display );                   
+    glutDisplayFunc( display );
+	glutSpecialFunc(camera_direction);
     glutKeyboardFunc( keyboard );                  
 
 	glutMainLoop();
