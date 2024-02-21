@@ -4,11 +4,11 @@
 
 
 // remember to prototype
-void generateGeometry( void );
-void initGPUBuffers( void );
-void shaderSetup( void );
-void display( void );
-void keyboard( unsigned char key, int x, int y );
+void generateGeometry(void);
+void initGPUBuffers(void);
+void shaderSetup(void);
+void display(void);
+void keyboard(unsigned char key, int x, int y);
 
 
 typedef vec4 point4;
@@ -31,7 +31,7 @@ GLuint loc_projection;
 GLuint view_loc;
 GLfloat l = -1.0, r = 1.0, t = 1.0, b = -1.0, zNear = 0.5, zFar = 6;
 GLfloat radius = 1, thetal = 180, phi = 0;
-GLfloat dr = 5.0 * M_PI / 180;  
+GLfloat dr = 5.0 * M_PI / 180;
 GLfloat theta[3] = { 0,0,0 };
 
 
@@ -85,32 +85,32 @@ void makeColorCube(void)  /* Sinh ra 12 tam giác: 36 đỉnh, 36 màu*/
 	quad(4, 5, 6, 7);
 	quad(5, 4, 0, 1);
 }
-void generateGeometry( void )
+void generateGeometry(void)
 {
 	initCube();
 	makeColorCube();
 }
 
 
-void initGPUBuffers( void )
+void initGPUBuffers(void)
 {
 	// Tạo một VAO - vertex array object
 	GLuint vao;
-    glGenVertexArrays( 1, &vao );     
-    glBindVertexArray( vao );
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 
-    // Tạo và khởi tạo một buffer object
-    GLuint buffer;
-    glGenBuffers( 1, &buffer );
-    glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    //glBufferData( GL_ARRAY_BUFFER, sizeof(points)+sizeof(colors), NULL, GL_STATIC_DRAW );
+	// Tạo và khởi tạo một buffer object
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	//glBufferData( GL_ARRAY_BUFFER, sizeof(points)+sizeof(colors), NULL, GL_STATIC_DRAW );
 	glBufferData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors) + sizeof(normals), NULL, GL_STATIC_DRAW);
 
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(points), points);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors); 
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors), sizeof(normals), normals);
-	
+
 }
 /* Khởi tạo các tham số chiếu sáng - tô bóng*/
 point4 light_position(0.0, 0.0, 1.0, 0.0);
@@ -126,16 +126,16 @@ float material_shininess = 100.0;
 color4 ambient_product = light_ambient * material_ambient;
 color4 diffuse_product = light_diffuse * material_diffuse;
 color4 specular_product = light_specular * material_specular;
-void shaderSetup( void )
+void shaderSetup(void)
 {
 	// Nạp các shader và sử dụng chương trình shader
-    program = InitShader( "vshader1.glsl", "fshader1.glsl" );   // hàm InitShader khai báo trong Angel.h
-    glUseProgram( program );
+	program = InitShader("vshader1.glsl", "fshader1.glsl");   // hàm InitShader khai báo trong Angel.h
+	glUseProgram(program);
 
-    // Khởi tạo thuộc tính vị trí đỉnh từ vertex shader
-    GLuint loc_vPosition = glGetAttribLocation( program, "vPosition" );
-	glEnableVertexAttribArray( loc_vPosition );
-    glVertexAttribPointer(loc_vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+	// Khởi tạo thuộc tính vị trí đỉnh từ vertex shader
+	GLuint loc_vPosition = glGetAttribLocation(program, "vPosition");
+	glEnableVertexAttribArray(loc_vPosition);
+	glVertexAttribPointer(loc_vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
 	GLuint loc_vColor = glGetAttribLocation(program, "vColor");
 	glEnableVertexAttribArray(loc_vColor);
@@ -156,13 +156,14 @@ void shaderSetup( void )
 	view_loc = glGetUniformLocation(program, "View");
 	glEnable(GL_DEPTH_TEST);
 
-    glClearColor( 1.0, 1.0, 1.0, 1.0 );        /* Thiết lập màu trắng là màu xóa màn hình*/
+	glClearColor(1.0, 1.0, 1.0, 1.0);        /* Thiết lập màu trắng là màu xóa màn hình*/
 }
 
-GLfloat z,x;
+GLfloat z, x;
 vec4 mautu = vec4(0.5, 0.5, 0.5, 1.0);
-vec4 maucuatu = vec4(0.8,0.8,0.8, 1.0);
+vec4 maucuatu = vec4(0.8, 0.8, 0.8, 1.0);
 vec4 maumaychieu = vec4(1.0, 0.0, 1.0, 1.0);
+vec4 maudieuhoa = vec4(0.6, 0.7, 0.5, 1.0);
 vec4 maubang = vec4(0.0, 0.0, 0.0, 1.0);
 vec4 maumanchieu = vec4(1.0, 1.0, 1.0, 1.0);
 vec4 maucua = vec4(1.0, 1.0, 0.0, 1.0);
@@ -173,11 +174,11 @@ vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
 
 GLfloat xcam, ycam, zcam;
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
-	
+
 	material_diffuse = colorCode;
 	diffuse_product = light_diffuse * material_diffuse;
 
-	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product); 
+	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product);
 
 	point4 eye(xcam, 1, zcam, 1.0);
 	point4 at(sin(thetal) + xcam, 1, 1 + cos(thetal) + zcam, 1.0);
@@ -185,12 +186,12 @@ void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 
 	mat4 v = LookAt(eye, at, up);
 	glUniformMatrix4fv(view_loc, 1, GL_TRUE, v);
-	mat4 ins = Scale(x,y,z);
-	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase*mt*ins);
+	mat4 ins = Scale(x, y, z);
+	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase * mt * ins);
 
 	mat4 p = Frustum(l, r, b, t, zNear, zFar);
 	glUniformMatrix4fv(loc_projection, 1, GL_TRUE, p);
-	glDrawArrays(GL_TRIANGLES, 0, NumPoints); 
+	glDrawArrays(GL_TRIANGLES, 0, NumPoints);
 }
 
 void truMayChieu() {
@@ -208,7 +209,7 @@ GLfloat keo = 0;
 bool checkkeo = false;
 
 void manChieu() {
-	model = Translate(0, 0.5 * keo, -6.8 ) * RotateY(180);
+	model = Translate(0, 0.5 * keo, -6.8) * RotateY(180);
 	matPhang(wM, hM - keo, dM, model, maumanchieu);
 	model = Translate(0, 0.5 * hM + 0.5 * hTN, -6.8) * RotateY(180);
 	matPhang(wTN, hTN, dTN, model, maumanchieu);
@@ -220,6 +221,19 @@ void mayChieu() {
 	hopMayChieu();
 }
 
+void khungDieuHoa() {
+	model = Translate(1.2, 0.6, 1.7);
+	matPhang(1.2, 0.05, 1.0, model, maudieuhoa);
+}
+void voDieuHoa() {
+	model = Translate(1.2, 0.5, 1.7);
+	matPhang(1.0, 0.05, 0.7, model, maudieuhoa);
+}
+void dieuHoa() {
+	khungDieuHoa();
+	voDieuHoa();
+}
+
 
 void matBan() {
 	model = Translate(0, 0.3, 0);
@@ -228,7 +242,7 @@ void matBan() {
 
 void chanBan() {
 	//chan 1
-	model = Translate(-0.375,-0.01,-0.2);
+	model = Translate(-0.375, -0.01, -0.2);
 	matPhang(0.02, 0.6, 0.02, model, maubanghe);
 
 	//chan 2
@@ -300,7 +314,7 @@ void chanGhe() {
 	model = Translate(0.175, -0.15, -0.6 - keoghe);
 	matPhang(0.02, 0.3, 0.02, model, maubanghe);
 
-	
+
 }
 void caiGhe() {
 	chanGhe();
@@ -320,7 +334,7 @@ GLfloat quayLaptop = 0;
 int laptopState = 0;
 bool isLaptopOpen = true;
 
-void laptop() {	
+void laptop() {
 	//than duoi
 	model = Translate(0, 0, 0);
 	matPhang(0.6, 0.02, 0.5, model, mautu);
@@ -350,7 +364,7 @@ void laptop() {
 	matPhang(0.6, 0.03, 0.01, model, mautu);
 
 	//man hinh
-	vec4 mauManHinh = isLaptopOpen ? mautuong: vec4(0, 0, 0, 0);
+	vec4 mauManHinh = isLaptopOpen ? mautuong : vec4(0, 0, 0, 0);
 	model = Translate(0, 0.28, -0.25);
 	matPhang(0.57, 0.45, 0.005, model, mauManHinh);
 
@@ -366,9 +380,9 @@ void banGiaoVien() {
 	quayBase *= Translate(-0.2, 0.35, 0) * RotateY(180) * Scale(0.5, 0.5, 0.5);
 	laptop();
 	quayBase = tmpQuayBase;
-	quayBase *= RotateY(20)*Translate(0.25,0,0.15);
+	quayBase *= RotateY(20) * Translate(0.25, 0, 0.15);
 	MayTinh();
-	
+
 }
 
 GLfloat heighTu = 1.8;
@@ -394,7 +408,7 @@ void khungTu() {
 
 	// ngăn ngag tủ trên 
 	model = Translate(0, 0.25 * heighTu, 0);
-	matPhang(widthTu, day+0.02, widthTu, model, mautu);
+	matPhang(widthTu, day + 0.02, widthTu, model, mautu);
 	// ngăn ngag tủ giữa 
 	model = Translate(0, 0, 0);
 	matPhang(widthTu, day + 0.02, widthTu, model, mautu);
@@ -515,11 +529,11 @@ GLfloat quayCuaChinh1 = 0, quayCuaChinh2 = 0;
 
 void cuaChinh() {
 	//canh cua 1 
-	model =  Translate(-3.25,0,-5.25) * RotateY(quayCuaChinh1) * Translate(0, 0.4, 0.5 * 0.75);
+	model = Translate(-3.25, 0, -5.25) * RotateY(quayCuaChinh1) * Translate(0, 0.4, 0.5 * 0.75);
 	matPhang(0.02, 1.5, 0.75, model, maucua);
 
 	//canh cua 2 
-	model =  Translate(-3.25, 0, -3.75)* RotateY(180)  * RotateY(quayCuaChinh2) * Translate(0, 0.4, 0.5 * 0.75);
+	model = Translate(-3.25, 0, -3.75) * RotateY(180) * RotateY(quayCuaChinh2) * Translate(0, 0.4, 0.5 * 0.75);
 	matPhang(0.02, 1.5, 0.75, model, maucua);
 }
 
@@ -558,9 +572,9 @@ void canPhong() {
 	caiBan();
 	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -3.6) * RotateY(90);
 	caiBan();
-	
+
 	//tu
-	quayBase = Translate(0,0,z) * Translate(-2.8, 0.6, -6.5) * RotateY(180);
+	quayBase = Translate(0, 0, z) * Translate(-2.8, 0.6, -6.5) * RotateY(180);
 	tu();
 
 	//tuong 
@@ -570,28 +584,37 @@ void canPhong() {
 	tuongPhai();
 
 	//san
-	quayBase = Translate(0, 0, z) ;
+	quayBase = Translate(0, 0, z);
 	san();
 
 	//tran nha
-	quayBase = Translate(0, 0, z) ;
+	quayBase = Translate(0, 0, z);
 	tranNha();
 
 	//tuong sau
-	quayBase = Translate(0, 0, z) ;
+	quayBase = Translate(0, 0, z);
 	tuongSau();
 
-	quayBase = Translate(0, 0, z) * Translate(0,0,9.9);
+	quayBase = Translate(0, 0, z) * Translate(0, 0, 9.9);
 	tuongSau();
 
 	//bang
 	quayBase = Translate(0, 0, z);
 	bang();
-	
+
 	//Man chieu
-	quayBase = Translate(0, 0, z) * Translate(0, 2.45 ,0);
+	quayBase = Translate(0, 0, z) * Translate(0, 2.45, 0);
 	manChieu();
 
+	//dieuhoa
+	quayBase = Translate(0, 0, z) * Translate(0.28, 4, -2.25) * RotateY(-90);//phai duoi
+	dieuHoa();
+	quayBase = Translate(0, 0, z) * Translate(0.28, 4, -4.66) * RotateY(-90);//
+	dieuHoa();
+	quayBase = Translate(0, 0, z) * Translate(-0.28, 4, -2.25) * RotateY(90);//trai tren
+	dieuHoa();
+	quayBase = Translate(0, 0, z) * Translate(-0.28, 4, 0.16) * RotateY(90);//trai duoi
+	dieuHoa();
 	//ban giao vien
 	quayBase = Translate(0, 0, z) * Translate(1.8, 0, -4.8);
 	banGiaoVien();
@@ -605,21 +628,21 @@ void canPhong() {
 	cuaChinh();
 
 	//cua so
-	quayBase = Translate(0, 0, z) * Translate(3.25,1.5,1);
+	quayBase = Translate(0, 0, z) * Translate(3.25, 1.5, 1);
 	cuaSo();
 	quayBase = Translate(0, 0, z) * Translate(3.25, 1.5, -2);
 	cuaSo();
 	quayBase = Translate(0, 0, z) * Translate(3.25, 1.5, -5);
 	cuaSo();
-	
+
 }
 
-void display( void )
+void display(void)
 {
 	const vec3 viewer_pos(0, 1, 1);
-    glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
-	canPhong();	
-	glutSwapBuffers();									   
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	canPhong();
+	glutSwapBuffers();
 }
 
 
@@ -704,7 +727,7 @@ void keyboard(unsigned char key, int x, int y)
 	// keyboard handler
 
 	switch (key) {
-	//quay cửa - c
+		//quay cửa - c
 	case 'c':
 		if (quayCuaChinh1 < 90)
 			quayCuaChinh1 += 5;
@@ -719,23 +742,23 @@ void keyboard(unsigned char key, int x, int y)
 			quayCuaChinh2 += 5;
 		break;
 
-	//mo cua so - v
+		//mo cua so - v
 	case 'v':
 		moCuaso(cuaSoState);
 		break;
-	//mo tu - o
+		//mo tu - o
 	case 'o':
 		motu(tuState);
 		break;
-	//gap laptop - l
+		//gap laptop - l
 	case 'l':
 		molaptop(laptopState);
 		break;
-	//mo laptop - p
+		//mo laptop - p
 	case 'i':
 		isLaptopOpen = !isLaptopOpen;
 		break;
-	//kéo màn chiếu - k
+		//kéo màn chiếu - k
 	case 'k': {
 		if (!checkkeo) {
 			keo += 0.02;
@@ -754,7 +777,7 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	}
 
-	//kéo ghế - h
+			//kéo ghế - h
 	case 'h': {
 		if (!checkkeoghe) {
 			keoghe -= 0.02;
@@ -775,12 +798,12 @@ void keyboard(unsigned char key, int x, int y)
 
 
 
-	//case 'd': thetal -= 0.1; break;
-	//case 'a': thetal += 0.1; break;
-	//case 'w': z += 0.1; break;
-	//case 's': z -= 0.1; break;
+			//case 'd': thetal -= 0.1; break;
+			//case 'a': thetal += 0.1; break;
+			//case 'w': z += 0.1; break;
+			//case 's': z -= 0.1; break;
 
-	
+
 
 	case 'x': l *= 1.1; r *= 1.1; break;
 	case 'X': l *= 0.9; r *= 0.9; break;
@@ -817,27 +840,27 @@ void keyboard(unsigned char key, int x, int y)
 }
 
 
-int main( int argc, char **argv )
+int main(int argc, char** argv)
 {
 	// main function: program starts here
 
-    glutInit( &argc, argv );                       
-    glutInitDisplayMode( GLUT_DOUBLE|GLUT_RGBA);
-    glutInitWindowSize( 640, 640 );                 
-	glutInitWindowPosition(100,150);               
-    glutCreateWindow( "Drawing a Room A1" );            
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowSize(640, 640);
+	glutInitWindowPosition(100, 150);
+	glutCreateWindow("Drawing a Room A1");
 
-   
-	glewInit();										
 
-    generateGeometry( );                          
-    initGPUBuffers( );							   
-    shaderSetup( );                               
+	glewInit();
 
-    glutDisplayFunc( display );
+	generateGeometry();
+	initGPUBuffers();
+	shaderSetup();
+
+	glutDisplayFunc(display);
 	glutSpecialFunc(camera_direction);
-    glutKeyboardFunc( keyboard );                  
+	glutKeyboardFunc(keyboard);
 
 	glutMainLoop();
-    return 0;
+	return 0;
 }
