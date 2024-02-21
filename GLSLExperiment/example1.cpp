@@ -173,7 +173,6 @@ vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
 vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
 
 GLfloat xcam, ycam, zcam;
-GLfloat xcam, ycam, zcam;
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 
 	material_diffuse = colorCode;
