@@ -173,26 +173,124 @@ vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
 vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
 
 GLfloat xcam, ycam, zcam;
+GLfloat xcam, ycam, zcam;
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 
 	material_diffuse = colorCode;
 	diffuse_product = light_diffuse * material_diffuse;
 
 	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product);
-
-	point4 eye(xcam, 1, zcam, 1.0);
-	point4 at(sin(thetal) + xcam, 1, 1 + cos(thetal) + zcam, 1.0);
-	vec4 up(0, 1, 0, 1.0);
-
-	mat4 v = LookAt(eye, at, up);
-	glUniformMatrix4fv(view_loc, 1, GL_TRUE, v);
 	mat4 ins = Scale(x, y, z);
 	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase * mt * ins);
+	glDrawArrays(GL_TRIANGLES, 0, NumPoints);
+}
+
+
+point4 Rotate_at(point4 eye, point4 at, GLfloat theta) {
+	GLfloat angle = DegreesToRadians * theta;
+
+	//vec4 eye_at_vec = vec4(at.x - eye.x, at.y - eye.y, at.z - eye.z, 1.0);
+
+	mat4 at_mat;
+	at_mat[0][0] = at.x;
+	at_mat[1][0] = at.y;
+	at_mat[2][0] = at.z;
+	at_mat[3][0] = 1.0;
+	//mat4 eye_mat = Translate(eye.x, eye.y, eye.z);
+	mat4 eye_mat;
+	eye_mat[0][3] = eye.x;
+	eye_mat[1][3] = eye.y;
+	eye_mat[2][3] = eye.z;
+	eye_mat[0][0] = eye_mat[1][1] = eye_mat[2][2] = eye_mat[3][3] = 1.0;
+
+	//mat4 rotate_mat = RotateY(theta);
+	mat4 rotate_mat;
+	rotate_mat[2][2] = rotate_mat[0][0] = cos(angle);
+	rotate_mat[0][2] = sin(angle);
+	rotate_mat[2][0] = -rotate_mat[0][2];
+	rotate_mat[1][1] = rotate_mat[3][3] = 1.0;
+
+	//mat4 at_mat;
+	//at_mat[3][0] = at.x;
+	//at_mat[3][1] = at.y;
+	//at_mat[3][2] = at.z;
+	//at_mat[0][0] = at_mat[1][1] = at_mat[2][2] = at_mat[3][3] = 1;
+	//Print("Mat");
+	//Print((float) at_mat[3][0]);
+	//Print((float) at_mat[3][1]);
+	//Print((float) at_mat[3][2]);
+	mat4 at2_mat = rotate_mat * at_mat * eye_mat;
+
+
+	/*point4 at_point(at_mat[3][0], at_mat[3][1], at_mat[3][2], 1.0);*/
+
+	point4 at_point(at2_mat[0][0], at2_mat[1][0], at2_mat[2][0], 1.0);
+	return at_point;
+}
+
+point4 Rotate_eye(point4 eye, GLfloat theta) {
+	GLfloat angle = DegreesToRadians * theta;
+
+	//vec4 eye_at_vec = vec4(at.x - eye.x, at.y - eye.y, at.z - eye.z, 1.0);
+
+
+	mat4 eye_mat;
+	eye_mat[0][0] = eye.x;
+	eye_mat[1][0] = eye.y;
+	eye_mat[2][0] = eye.z;
+	/*at_mat[3][0] = 1.0;*/
+	//mat4 eye_mat = Translate(eye.x, eye.y, eye.z);
+	//mat4 eye_mat;
+	//eye_mat[0][3] = eye.x;
+	//eye_mat[1][3] = eye.y;
+	//eye_mat[2][3] = eye.z;
+	/*eye_mat[0][0] = eye_mat[1][1] = eye_mat[2][2] = eye_mat[3][3] = 1.0;*/
+
+	mat4 rotate_mat = RotateY(theta);
+	//mat4 rotate_mat;
+	//rotate_mat[2][2] = rotate_mat[0][0] = cos(angle);
+	//rotate_mat[0][2] = sin(angle);
+	//rotate_mat[2][0] = -rotate_mat[0][2];
+	/*rotate_mat[1][1] = rotate_mat[3][3] = 1.0;*/
+
+	//mat4 at_mat;
+	//at_mat[3][0] = at.x;
+	//at_mat[3][1] = at.y;
+	//at_mat[3][2] = at.z;
+	//at_mat[0][0] = at_mat[1][1] = at_mat[2][2] = at_mat[3][3] = 1;
+	//Print("Mat");
+	//Print((float) at_mat[3][0]);
+	//Print((float) at_mat[3][1]);
+	//Print((float) at_mat[3][2]);
+	mat4 eye2_mat = rotate_mat * eye_mat;
+
+
+	/*point4 at_point(at_mat[3][0], at_mat[3][1], at_mat[3][2], 1.0);*/
+
+	point4 eye_point(eye2_mat[0][0], eye2_mat[1][0], eye2_mat[2][0], 1.0);
+	return eye_point;
+
+}
+
+void khungNhin() {
+
+	point4 eye(xcam, 1, zcam, 1.0);
+
+	vec4 up(0, 1, 0, 1.0);
+
+	point4 at(xcam, 1, zcam + 1, 1.0);
+
+	point4 rotateEye = Rotate_eye(eye, thetal);
+
+	point4 rotateAt = Rotate_at(eye, at, thetal);
+
+	mat4 v = LookAt(rotateEye, rotateAt, up);
+	glUniformMatrix4fv(view_loc, 1, GL_TRUE, v);
 
 	mat4 p = Frustum(l, r, b, t, zNear, zFar);
 	glUniformMatrix4fv(loc_projection, 1, GL_TRUE, p);
-	glDrawArrays(GL_TRIANGLES, 0, NumPoints);
 }
+
 
 void truMayChieu() {
 	model = Translate(0, 0.25, 0);
