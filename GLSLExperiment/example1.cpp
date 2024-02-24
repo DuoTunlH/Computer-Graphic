@@ -17,10 +17,14 @@ using namespace std;
 
 // Số các đỉnh của các tam giác
 const int NumPoints = 36;
+const int diemHinhTru = 720;
 
-point4 points[NumPoints]; /* Danh sách các đỉnh của các tam giác cần vẽ*/
-color4 colors[NumPoints]; /* Danh sách các màu tương ứng cho các đỉnh trên*/
-vec3 normals[NumPoints]; /*Danh sách các vector pháp tuyến ứng với mỗi đỉnh*/
+const int n = 30;
+double PI = 3.14;
+
+point4 points[NumPoints + diemHinhTru]; /* Danh sách các đỉnh của các tam giác cần vẽ*/
+color4 colors[NumPoints + diemHinhTru]; /* Danh sách các màu tương ứng cho các đỉnh trên*/
+vec3 normals[NumPoints + diemHinhTru]; /*Danh sách các vector pháp tuyến ứng với mỗi đỉnh*/
 
 point4 vertices[8]; /* Danh sách 8 đỉnh của hình lập phương*/
 color4 vertex_colors[8]; /*Danh sách các màu tương ứng cho 8 đỉnh hình lập phương*/
@@ -85,10 +89,50 @@ void makeColorCube(void)  /* Sinh ra 12 tam giác: 36 đỉnh, 36 màu*/
 	quad(4, 5, 6, 7);
 	quad(5, 4, 0, 1);
 }
+
+void add(point4 A, point4 B, point4 C) {
+	vec4 u = B - A;
+	vec4 v = C - B;
+	vec3 normal = normalize(cross(u, v));
+	normals[Index] = normal;
+	points[Index] = A;
+	colors[Index] = vertex_colors[2];
+	Index++;
+	normals[Index] = normal;
+	points[Index] = B;
+	colors[Index] = vertex_colors[7];
+	Index++;
+	normals[Index] = normal;
+	points[Index] = C;
+	colors[Index] = vertex_colors[2];
+	Index++;
+
+}
+void quadHinhTru(int n, float r1, float r2, float h, float h2) {
+	const float apha = (2 * PI) / n;
+	for (int i = 0; i < n; i++) {
+		vec4 A = point4(r1 * cos((i - 2) * apha), h, r1 * sin((i - 2) * apha), 1.0);
+		vec4 B = point4(r1 * cos((i - 1) * apha), h, r1 * sin((i - 1) * apha), 1.0);
+		vec4 C = point4(r2 * cos((i - 2) * apha), h2, r2 * sin((i - 2) * apha), 1.0);
+		vec4 D = point4(r2 * cos((i - 1) * apha), h2, r2 * sin((i - 1) * apha), 1.0);
+		add(A, C, D);
+		add(A, D, B);
+	}
+};
+
+void initHinhTru(void) {
+
+	quadHinhTru(n, 1.0f, 1.0f, -0.5f, 0.5f);
+	quadHinhTru(n, 0.2f, 0.2f, -0.5f, 0.5f);
+	quadHinhTru(n, 0.8f, 1.0f, 0.5f, 0.5f);
+	quadHinhTru(n, 0.8f, 1.0f, -0.5f, -0.5f);
+
+}
 void generateGeometry(void)
 {
 	initCube();
 	makeColorCube();
+	initHinhTru();
 }
 
 
@@ -160,8 +204,9 @@ void shaderSetup(void)
 }
 
 GLfloat z, x;
-vec4 mautu = vec4(0.5, 0.5, 0.5, 1.0);
+vec4 mautu = vec4(0.9, 0.9, 0.9, 1.0);
 vec4 maucuatu = vec4(0.8, 0.8, 0.8, 1.0);
+vec4 mautaykeocuatu = vec4(0.5, 0.5, 0.4, 1.0);
 vec4 maumaychieu = vec4(1.0, 0.0, 1.0, 1.0);
 vec4 maudieuhoa = vec4(0.6, 0.7, 0.5, 1.0);
 vec4 maubang = vec4(0.0, 0.0, 0.0, 1.0);
@@ -171,6 +216,7 @@ vec4 maubanghe = vec4(1.0, 0.0, 0.0, 1.0);
 vec4 maumaytinh = vec4(0.0, 1.0, 0.0, 1.0);
 vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
 vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
+vec4 mauden = vec4(0, 0, 0.0, 1.0);
 
 GLfloat xcam, ycam, zcam;
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
@@ -184,6 +230,16 @@ void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 	glDrawArrays(GL_TRIANGLES, 0, NumPoints);
 }
 
+void hinhTru(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
+
+	material_diffuse = colorCode;
+	diffuse_product = light_diffuse * material_diffuse;
+
+	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product);
+	mat4 ins = Scale(x, y, z);
+	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase * mt * ins);
+	glDrawArrays(GL_TRIANGLES, NumPoints, diemHinhTru);
+}
 
 point4 Rotate_at(point4 eye, point4 at, GLfloat theta) {
 	GLfloat angle = DegreesToRadians * theta;
@@ -467,6 +523,9 @@ void laptop() {
 
 	model = Translate(0, 0.28, -0.255);
 	matPhang(0.57, 0.455, 0.001, model, mautu);
+
+	model = Translate(0, 0.28, -0.255) * RotateX(90);
+	hinhTru(0.1, 0.003, 0.1, model, mauden);
 }
 
 void banGiaoVien() {
@@ -525,28 +584,47 @@ void cuaTu() {
 	// cửa 1 trái
 	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
+	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(MoTu) * Translate(widthCT * 0.7, 0, -0.03 * 0.5);
+	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
+	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(MoTu) * Translate(widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	hinhTru(0.018, 0.02, 0.018, model, mauden);
+
 	// cửa 2 trái
 	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
+	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.7, 0, -0.03 * 0.5);
+	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
 	// cửa 3 trái
 	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
+	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.7, 0, -0.03 * 0.5);
+	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
 	// cửa 4 trái
 	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
+	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.7, 0, -0.03 * 0.5);
+	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
 
 	// cửa 1 phai
 	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
+	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.7, 0, -0.03 * 0.5);
+	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
 	// cửa 2 phai
 	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
+	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.7, 0, -0.03 * 0.5);
+	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
 	// cửa 3 phai
 	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
+	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.7, 0, -0.03 * 0.5);
+	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
 	// cửa 4 phai
 	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
+	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.7, 0, -0.03 * 0.5);
+	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
 }
 void tu() {
 	khungTu();
@@ -599,9 +677,43 @@ void cuaSo() {
 	matPhang(0.04, 0.04, 0.72, model, mautu);
 	model = Translate(0, -0.5, 0.35);
 	matPhang(0.04, 0.04, 0.72, model, mautu);
+
 	//cua kinh
-	model = Translate(0, 0.5, 0) * RotateZ(quayCuaSo) * Translate(0, -0.5, 0) * Translate(0, 0, 0.35);
+	mat4 tmpQuayBase = quayBase;
+	quayBase *= Translate(0, 0.5, 0) * RotateZ(quayCuaSo) * Translate(0, -0.5, 0) ;
+
+	model = Translate(0, 0, 0.04);
+	matPhang(0.04, 1 - 2 * 0.04, 0.03, model, maucuatu);
+	model = Translate(0, 0, 0.66);
+	matPhang(0.04, 1 - 2 * 0.04, 0.03, model, maucuatu);
+
+
+	model = Translate(0, 0.5 - 0.04, 0.35);
+	matPhang(0.04, 0.04, 0.72 - 2*0.04, model, maucuatu);
+	model = Translate(0, -0.5 + 0.04, 0.35);
+	matPhang(0.04, 0.04, 0.72 - 2 * 0.04, model, maucuatu);
+
+	//tay nam cua
+	model = Translate(-0.08, -0.5 + 0.04, 0.35);
+	matPhang(0.08, 0.04, 0.04, model, mauden);
+
+
+	model = Translate(-0.08 - 0.08, -0.5 + 0.04, 0.35  + 0.15 * 0.5 - 0.02);
+	matPhang(0.08, 0.04, 0.15, model, mauden);
+
+	model = Translate(0, 0, 0.35);
 	matPhang(0.02, 1, 0.7, model, mautrang);
+
+	quayBase = tmpQuayBase;
+
+	quayBase *= Translate(0, -0.5, 0) * RotateZ(-quayCuaSo) *Translate(0,0.5,0);
+	model = Translate(0, -0.25, 0.03);
+	matPhang(0.02, 0.5, 0.01, model, maucuatu);
+
+	model = Translate(0, -0.25, 0.67);
+	matPhang(0.02, 0.5, 0.01, model, maucuatu);
+
+
 }
 void tranNha() {
 	model = Translate(0, 4.68, -1.95);
@@ -784,21 +896,21 @@ void motu(int value) {
 
 void moCuaso(int value) {
 	if (cuaSoState == 0) {
-		if (quayCuaSo == 45) {
+		if (quayCuaSo == 18) {
 			cuaSoState = 1;
 			return;
 		}
-		quayCuaSo += 5;
+		quayCuaSo += 2;
 	}
 	if (cuaSoState == 1) {
 		if (quayCuaSo == 0) {
 			cuaSoState = 0;
 			return;
 		}
-		quayCuaSo -= 5;
+		quayCuaSo -= 2;
 	}
 	glutPostRedisplay();
-	glutTimerFunc(100, moCuaso, 0);
+	glutTimerFunc(70, moCuaso, 0);
 }
 
 void camera_movement(unsigned char key) {
@@ -813,8 +925,8 @@ void camera_movement(unsigned char key) {
 
 void camera_direction(int key, int a, int b) {
 	switch (key) {
-	case GLUT_KEY_LEFT: thetal -= 0.1; break;
-	case GLUT_KEY_RIGHT: thetal += 0.1; break;
+	case GLUT_KEY_LEFT: thetal -= 1; break;
+	case GLUT_KEY_RIGHT: thetal += 1; break;
 	}
 	glutPostRedisplay();
 }
