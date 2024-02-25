@@ -580,51 +580,74 @@ GLfloat widthCT = 0.5 * widthTu;
 GLfloat heightCT = 0.25 * heighTu;
 GLfloat MoTu = 0;
 int tuState = 0;
+GLfloat MoTu1 = 0;
+int tuState1 = 0;
+GLfloat MoTu2 = 0;
+int tuState2 = 0;
 void cuaTu() {
 	// cửa 1 trái
-	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
+	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu1) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
-	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(MoTu) * Translate(widthCT * 0.7, 0, -0.03 * 0.5);
+	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu1) * Translate(widthCT * 0.65, 0, -0.03 * 0.5);
 	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
-	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(MoTu) * Translate(widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	model = Translate(-widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(MoTu1) * Translate(widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
 	hinhTru(0.018, 0.02, 0.018, model, mauden);
 
 	// cửa 2 trái
 	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
-	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.7, 0, -0.03 * 0.5);
+	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.65, 0, -0.03 * 0.5);
 	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
+	model = Translate(-widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(MoTu) * Translate(widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	hinhTru(0.018, 0.02, 0.018, model, mauden);
+
 	// cửa 3 trái
 	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
-	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.7, 0, -0.03 * 0.5);
+	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.65, 0, -0.03 * 0.5);
 	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
+	model = Translate(-widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(MoTu) * Translate(widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	hinhTru(0.018, 0.02, 0.018, model, mauden);
+
 	// cửa 4 trái
 	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
-	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.7, 0, -0.03 * 0.5);
+	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(MoTu) * Translate(widthCT * 0.65, 0, -0.03 * 0.5);
 	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
+	model = Translate(-widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(MoTu) * Translate(widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	hinhTru(0.018, 0.02, 0.018, model, mauden);
 
 	// cửa 1 phai
-	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
+	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu2) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
-	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.7, 0, -0.03 * 0.5);
+	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu2) * Translate(-widthCT * 0.65, 0, -0.03 * 0.5);
 	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
+	model = Translate(widthCT, 1.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(-MoTu2) * Translate(-widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	hinhTru(0.018, 0.02, 0.018, model, mauden);
+
 	// cửa 2 phai
 	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
-	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.7, 0, -0.03 * 0.5);
+	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.65, 0, -0.03 * 0.5);
 	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
+	model = Translate(widthCT, 0.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(-MoTu) * Translate(-widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	hinhTru(0.018, 0.02, 0.018, model, mauden);
+
 	// cửa 3 phai
 	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
-	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.7, 0, -0.03 * 0.5);
+	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.65, 0, -0.03 * 0.5);
 	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
+	model = Translate(widthCT, -0.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(-MoTu) * Translate(-widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	hinhTru(0.018, 0.02, 0.018, model, mauden);
+
 	// cửa 4 phai
 	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.5, 0, 0);
 	matPhang(widthCT, heightCT - 0.025, day, model, maucuatu);
-	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.7, 0, -0.03 * 0.5);
+	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day) * RotateY(-MoTu) * Translate(-widthCT * 0.65, 0, -0.03 * 0.5);
 	matPhang(0.02, 0.1, 0.03, model, mautaykeocuatu);
+	model = Translate(widthCT, -1.5 * heightCT, -0.5 * widthTu + 0.5 * day - day) * RotateY(-MoTu) * Translate(-widthCT * 0.8, 0, -0.018 * 0.5) * RotateX(90);
+	hinhTru(0.018, 0.02, 0.018, model, mauden);
 }
 void tu() {
 	khungTu();
@@ -894,6 +917,44 @@ void motu(int value) {
 	glutTimerFunc(100, motu, 0);
 }
 
+void motu1(int value) {
+	if (tuState1 == 0) {
+		if (MoTu1 == 100) {
+			tuState1 = 1;
+			return;
+		}
+		MoTu1 += 5;
+	}
+	if (tuState1 == 1) {
+		if (MoTu1 == 0) {
+			tuState1 = 0;
+			return;
+		}
+		MoTu1 -= 5;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, motu1, 0);
+}
+
+void motu2(int value) {
+	if (tuState2 == 0) {
+		if (MoTu2 == 100) {
+			tuState2 = 1;
+			return;
+		}
+		MoTu2 += 5;
+	}
+	if (tuState2 == 1) {
+		if (MoTu2 == 0) {
+			tuState2 = 0;
+			return;
+		}
+		MoTu2 -= 5;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, motu2, 0);
+}
+
 void moCuaso(int value) {
 	if (cuaSoState == 0) {
 		if (quayCuaSo == 18) {
@@ -959,6 +1020,12 @@ void keyboard(unsigned char key, int x, int y)
 		//mo tu - o
 	case 'o':
 		motu(tuState);
+		break;
+	case '1':
+		motu1(tuState1);
+		break;
+	case '2':
+		motu2(tuState2);
 		break;
 		//gap laptop - l
 	case 'l':
