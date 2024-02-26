@@ -427,17 +427,19 @@ void chanBan() {
 	matPhang(0.2, 0.35, 0.4, model, maumaytinh);
 }
 
+GLfloat anphal = 0;
+
 void MayTinh() {
 	//De may tinh
-	model = Translate(0, 0.3, 0);
+	model = Translate(0, 0.3, 0)*RotateY(anphal);
 	matPhang(0.3, 0.03, 0.02, model, maumaytinh);
 
 	//Than may tinh
-	model = Translate(0, 0.45, 0);
+	model = Translate(0, 0.45, 0) * RotateY(anphal);
 	matPhang(0.05, 0.25, 0.02, model, maumaytinh);
 
 	//Man may tinh
-	model = Translate(0, 0.7, 0);
+	model = Translate(0, 0.7, 0)*RotateY(anphal);
 	matPhang(0.35, 0.4, 0.04, model, maumaytinh);
 }
 
@@ -685,6 +687,20 @@ void tuongPhai() {
 
 	model = Translate(3.25, 1.5, 2.35);
 	matPhang(0.02, 1, 1.32, model, mautuong);
+	//thanh doc
+	model = Translate(3.25, 2.2, -6);
+	matPhang(0.04, 5.0, 0.03, model, mautu);
+	model = Translate(3.25, 2.2, -3);
+	matPhang(0.04, 5.0, 0.03, model, mautu);
+	model = Translate(3.25, 2.2, 0);
+	matPhang(0.04, 5.0, 0.03, model, mautu);
+	model = Translate(3.25, 2.2, 2.5);
+	matPhang(0.04, 5.0, 0.03, model, mautu);
+	//thanh ngang
+	model = Translate(3.25, 2.0, -1.95);
+	matPhang(0.04, 0.04, 9.0, model, mautu);
+	model = Translate(3.25, 1.0, -1.95);
+	matPhang(0.04, 0.04, 9.0, model, mautu);
 }
 
 GLfloat quayCuaSo;
@@ -768,6 +784,60 @@ void cuaChinh() {
 	model = Translate(-3.25, 0, -3.75) * RotateY(180) * RotateY(quayCuaChinh2) * Translate(0, 0.4, 0.5 * 0.75);
 	matPhang(0.02, 1.5, 0.75, model, maucua);
 }
+
+GLfloat heighCauDao = 0.4;
+GLfloat widthCauDao = 0.3;
+GLfloat Doday_CauDao = 0.02;
+GLfloat MoCD = 0;
+int CDState = 0;
+GLfloat MoHCD = 0;
+int HCDState = 0;
+void KhungCauDao() {
+	//Mặt trái Cầu dao
+	model = Translate(-0.5 * widthCauDao - 0.5 * Doday_CauDao, 0, 0);
+	matPhang(Doday_CauDao, heighCauDao, widthCauDao, model, maudieuhoa);
+	//Mặt phải Cầu dao
+	model = Translate(0.5 * widthCauDao + 0.5 * Doday_CauDao, 0, 0);
+	matPhang(Doday_CauDao, heighCauDao, widthCauDao, model, maudieuhoa);
+	//Mặt trên Cầu dao
+	model = Translate(0, 0.5 * heighCauDao - 0.5 * Doday_CauDao, 0);
+	matPhang(widthCauDao, Doday_CauDao, widthCauDao, model, maudieuhoa);
+	//Mặt dưới Cầu dao
+	model = Translate(0, -0.5 * heighCauDao + 0.5 * Doday_CauDao, 0);
+	matPhang(widthCauDao, Doday_CauDao, widthCauDao, model, maudieuhoa);
+	// mặt sau Cầu dao
+	model = Translate(0, 0, 0.5 * widthCauDao - 0.5 * Doday_CauDao);
+	matPhang(widthCauDao, heighCauDao, Doday_CauDao, model, maudieuhoa);
+}
+void CuaCauDao() {
+	model = Translate(widthCauDao*0.5, 0, -0.5 *widthCauDao + 0.5 * Doday_CauDao) * RotateY(-MoHCD) * Translate(-widthCauDao * 0.5, 0, 0);
+	matPhang(widthCauDao, heighCauDao, Doday_CauDao, model, maudieuhoa);
+	model = Translate(widthCauDao*0.5, 0, -0.5 * widthCauDao + 0.5 * Doday_CauDao - Doday_CauDao) * RotateY(-MoHCD) * Translate(-widthCauDao * 0.5, 0,0);
+	matPhang(0.03, 0.1, 0.01, model, maumanchieu);
+}
+void ApToMat() {
+	model = Translate(0, 0, 0.5 * widthCauDao - 0.5 * Doday_CauDao);
+	matPhang(0.2, 0.15, 0.2, model, maumanchieu);
+
+	model = Translate(0, 0, 0.5 * widthCauDao - 0.5 * Doday_CauDao);
+	matPhang(0.02, 0.4, 0.1, model, maumaychieu);
+
+	model = Translate(-0.035, 0, 0.5 * widthCauDao - 0.5 * Doday_CauDao);
+	matPhang(0.02, 0.4, 0.1, model, maubanghe);
+
+	model = Translate(0.035, 0, 0.5 * widthCauDao - 0.5 * Doday_CauDao );
+	matPhang(0.02, 0.4, 0.1, model, maucua);
+
+	model = Translate(0, 0, widthCauDao*0.5*0.5) * RotateX(MoCD) * Translate(0, 0,-widthCauDao*0.5*0.5);
+	matPhang(0.2, 0.02, 0.05, model, mauden);
+
+}
+void CauDao() {
+	KhungCauDao();
+	CuaCauDao();
+	ApToMat();
+}
+
 
 void canPhong() {
 	quayBase = Translate(0, 0, z) * Translate(-0.23, 0, 0) * RotateY(90);
@@ -866,7 +936,10 @@ void canPhong() {
 	cuaSo();
 	quayBase = Translate(0, 0, z) * Translate(3.25, 1.5, -5);
 	cuaSo();
-
+	
+	//CauDao
+	quayBase = Translate(0, 0, z) * Translate(-2.0, 1.8, -6.7) * RotateY(180);
+	CauDao();
 }
 
 void display(void)
@@ -974,6 +1047,44 @@ void moCuaso(int value) {
 	glutTimerFunc(70, moCuaso, 0);
 }
 
+void moCD(int value) {
+	if (CDState == 0) {
+		if (MoCD == 20) {
+			CDState = 1;
+			return;
+		}
+		MoCD += 5;
+	}
+	if (CDState == 1) {
+		if (MoCD == 0) {
+			CDState = 0;
+			return;
+		}
+		MoCD -= 5;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, moCD, 0);
+}
+
+void moHCD(int value) {
+	if (HCDState == 0) {
+		if (MoHCD == 100) {
+			HCDState = 1;
+			return;
+		}
+		MoHCD += 5;
+	}
+	if (HCDState == 1) {
+		if (MoHCD == 0) {
+			HCDState = 0;
+			return;
+		}
+		MoHCD -= 5;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, moHCD, 0);
+}
+
 void camera_movement(unsigned char key) {
 	switch (key) {
 	case 'd': xcam -= 0.1; break;
@@ -1012,7 +1123,27 @@ void keyboard(unsigned char key, int x, int y)
 		if (quayCuaChinh2 < 0)
 			quayCuaChinh2 += 5;
 		break;
-
+		//mo ap to mat - m
+	case 'm':
+		moCD(CDState);
+		break;
+		//mo cau dao - n
+	case 'n':
+		moHCD(HCDState);
+		break;
+		//quay may tinh
+	case 'j':
+		anphal -= 5;
+		if (anphal < -90) {
+			anphal = -90;
+		}
+		break;
+	case 'J':
+		anphal += 5;
+		if (anphal > 0) {
+			anphal = 0;
+		}
+		break;
 		//mo cua so - v
 	case 'v':
 		moCuaso(cuaSoState);
