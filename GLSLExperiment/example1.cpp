@@ -217,6 +217,8 @@ vec4 maumaytinh = vec4(0.0, 1.0, 0.0, 1.0);
 vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
 vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
 vec4 mauden = vec4(0, 0, 0.0, 1.0);
+vec4 maulacay = vec4(0.0, 1.0, 0.0, 1.0);
+vec4 mauthancay = vec4(0.5, 0.2, 0.0, 1.0);
 
 GLfloat xcam, ycam, zcam;
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
@@ -373,7 +375,56 @@ void mayChieu() {
 	truMayChieu();
 	hopMayChieu();
 }
+//cay canh
+void laCay1() {
+	for (int i = 0; i <= 90; i++) {
+		model = Translate(1.4, 0, -0.3) * RotateY(i);
+		matPhang(0.35, 0.15, 0.35, model, maulacay);
+	}
+	model *= Translate(0.35, 0, 0);
+	matPhang(0.8, 0.15, 0.5, model, maulacay);
+}
+void laCay2() {
+	for (int i = 0; i <= 90; i++) {
+		model = Translate(1.4, 0, -1.0) * RotateY(i);
+		matPhang(0.35, 0.15, 0.35, model, maulacay);
+	}
 
+}
+void laCay3() {
+
+	laCay1();
+	laCay2();
+}
+void laCay() {
+	mat4 tmpQuayBase = quayBase;
+	laCay3();
+	quayBase *= RotateZ(90) * Translate(-1.4, -1.4, 0);
+	laCay3();
+
+}
+void thanCay() {
+	model = Translate(1.4, 0, -1.4);
+	hinhTru(0.05, 0.05, 0.5, model, mauthancay);
+
+}
+
+void chauCay() {
+	model = Translate(1.4, 0, -2.0);
+	matPhang(0.44, 0.4, 0.5, model, maumaychieu);
+}
+GLfloat keochau = 0;
+bool checkkeochau = false;
+void cayCanh() {
+	mat4 tmpQuayBase = quayBase;
+	quayBase *= Translate(0 - keochau, 0, 0);
+	chauCay();
+	thanCay();
+	laCay();
+
+}
+
+//dieu hoa
 void khungDieuHoa() {
 	model = Translate(1.2, 0.6, 1.7);
 	matPhang(1.2, 0.05, 1.0, model, maudieuhoa);
@@ -387,11 +438,25 @@ void dieuHoa() {
 	voDieuHoa();
 }
 
+//den
+
+void Den() {
+	model = Translate(0, 0.25, 0);
+	matPhang(1.0, 0.02, 0.8, model, mautrang);
+}
+
+//loa
+void Loa() {
+	model = Translate(0, 0.25, 0);
+	matPhang(0.3, 0.6, 0.4, model, mauden);
+}
 
 void matBan() {
 	model = Translate(0, 0.3, 0);
 	matPhang(0.8, 0.02, 0.4, model, maubanghe);
 }
+
+//den
 
 void chanBan() {
 	//chan 1
@@ -837,7 +902,9 @@ void canPhong() {
 	//Man chieu
 	quayBase = Translate(0, 0, z) * Translate(0, 2.45, 0);
 	manChieu();
-
+	//cay canh
+	quayBase = Scale(0.7, 0.7, 0.7) * Translate(0, 0, z) * Translate(2.5, 1.8, -8.2) * RotateX(-90);
+	cayCanh();
 	//dieuhoa
 	quayBase = Translate(0, 0, z) * Translate(0.28, 4, -2.25) * RotateY(-90);//phai duoi
 	dieuHoa();
@@ -852,9 +919,34 @@ void canPhong() {
 	banGiaoVien();
 
 	//maychieu
-	quayBase = Translate(0, 0, z) * Translate(0.28, 4, -2.25);
+	quayBase = Translate(0, 0, z) * Translate(0.1, 4, -3.5);
 	mayChieu();
 
+	//den 
+	quayBase = Translate(0, 0, z) * Translate(0.1, 4.3, -2.2);
+	Den();
+	quayBase = Translate(0, 0, z) * Translate(2.3, 4.3, -2.2);
+	Den();
+	quayBase = Translate(0, 0, z) * Translate(-2.3, 4.3, -2.2);
+	Den();
+	quayBase = Translate(0, 0, z) * Translate(0.1, 4.3, -5);
+	Den();
+	quayBase = Translate(0, 0, z) * Translate(2.3, 4.3, -5);
+	Den();
+	quayBase = Translate(0, 0, z) * Translate(-2.3, 4.3, -5);
+	Den();
+	quayBase = Translate(0, 0, z) * Translate(0.1, 4.3, 0.5);
+	Den();
+	quayBase = Translate(0, 0, z) * Translate(2.3, 4.3, 0.5);
+	Den();
+	quayBase = Translate(0, 0, z) * Translate(-2.3, 4.3, 0.5);
+	Den();
+
+	//loa
+	quayBase = Translate(0, 0, z) * Translate(2.3, 4, 2.8);
+	Loa();
+	quayBase = Translate(0, 0, z) * Translate(-2.3, 4, 2.8);
+	Loa();
 	//cua chinh
 	quayBase = Translate(0, 0, z);
 	cuaChinh();
@@ -1053,7 +1145,24 @@ void keyboard(unsigned char key, int x, int y)
 		}
 		break;
 	}
-
+			//keo chau cay
+	case 'm': {
+		if (!checkkeochau) {
+			keochau -= 0.02;
+			if (keochau <= -0.4) {
+				keochau = -0.4;
+				checkkeochau = true;
+			}
+		}
+		else {
+			keochau += 0.02;
+			if (keochau >= 0) {
+				keochau = 0;
+				checkkeochau = false;
+			}
+		}
+		break;
+	}
 			//kéo ghế - h
 	case 'h': {
 		if (!checkkeoghe) {
