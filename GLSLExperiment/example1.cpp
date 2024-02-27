@@ -558,7 +558,7 @@ bool isLaptopOpen = true;
 void laptop() {
 	//than duoi
 	model = Translate(0, 0, 0);
-	matPhang(0.6, 0.02, 0.5, model, mautu);
+	matPhang(0.6, 0.02, 0.5, model, mauLaptop);
 
 	//banphim
 	model = Translate(0, 0.009, -0.03);
@@ -572,17 +572,17 @@ void laptop() {
 
 	//than tren thanh doc
 	model = Translate(-0.2925, 0.25, -0.25);
-	matPhang(0.015, 0.5, 0.015, model, mautu);
+	matPhang(0.015, 0.5, 0.015, model, mauLaptop);
 
 	model = Translate(0.2925, 0.25, -0.25);
-	matPhang(0.015, 0.5, 0.015, model, mautu);
+	matPhang(0.015, 0.5, 0.015, model, mauLaptop);
 
 	//than tren thanh ngang
 	model = Translate(0, 0.025, -0.25);
-	matPhang(0.6, 0.05, 0.01, model, mautu);
+	matPhang(0.6, 0.05, 0.01, model, mauLaptop);
 
 	model = Translate(0, 0.515, -0.25);
-	matPhang(0.6, 0.03, 0.01, model, mautu);
+	matPhang(0.6, 0.03, 0.01, model, mauLaptop);
 
 	//man hinh
 	vec4 mauManHinh = isLaptopOpen ? mautuong : vec4(0, 0, 0, 0);
@@ -590,7 +590,7 @@ void laptop() {
 	matPhang(0.57, 0.45, 0.005, model, mauManHinh);
 
 	model = Translate(0, 0.28, -0.255);
-	matPhang(0.57, 0.455, 0.001, model, mautu);
+	matPhang(0.57, 0.455, 0.001, model, mauLaptop);
 
 	model = Translate(0, 0.28, -0.255) * RotateX(90);
 	hinhTru(0.1, 0.003, 0.1, model, mauden);
