@@ -13,6 +13,7 @@ void keyboard(unsigned char key, int x, int y);
 
 typedef vec4 point4;
 typedef vec4 color4;
+typedef vec3 point3;
 using namespace std;
 
 // Số các đỉnh của các tam giác
@@ -29,10 +30,6 @@ vec3 normals[NumPoints + diemHinhTru]; /*Danh sách các vector pháp tuyến �
 point4 vertices[8]; /* Danh sách 8 đỉnh của hình lập phương*/
 color4 vertex_colors[8]; /*Danh sách các màu tương ứng cho 8 đỉnh hình lập phương*/
 
-GLuint program;
-GLuint loc_modelMatrix;
-GLuint loc_projection;
-GLuint view_loc;
 GLfloat l = -1.0, r = 1.0, t = 1.0, b = -1.0, zNear = 0.5, zFar = 6;
 GLfloat radius = 1, thetal = 180, phi = 0;
 GLfloat dr = 5.0 * M_PI / 180;
@@ -156,16 +153,47 @@ void initGPUBuffers(void)
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors), sizeof(normals), normals);
 
 }
-/* Khởi tạo các tham số chiếu sáng - tô bóng*/
-point4 light_position(0.0, 0.0, 1.0, 0.0);
-color4 light_ambient(0.2, 0.2, 0.2, 1.0);
-color4 light_diffuse(1.0, 1.0, 1.0, 1.0);
-color4 light_specular(1.0, 1.0, 1.0, 1.0);
+
+
+GLfloat z, x;
+vec4 mautu = vec4(0.9, 0.9, 0.9, 1.0);
+vec4 maucuatu = vec4(0.8, 0.8, 0.8, 1.0);
+vec4 mautaykeocuatu = vec4(0.5, 0.5, 0.4, 1.0);
+vec4 maumaychieu = vec4(1.0, 0.0, 1.0, 1.0);
+vec4 maudieuhoa = vec4(0.6, 0.7, 0.5, 1.0);
+vec4 maubang = vec4(0.0, 0.0, 0.0, 1.0);
+vec4 maumanchieu = vec4(1.0, 1.0, 1.0, 1.0);
+vec4 maucua = vec4(1.0, 1.0, 0.0, 1.0);
+vec4 maubanghe = vec4(1.0, 0.0, 0.0, 1.0);
+vec4 maumaytinh = vec4(0.0, 1.0, 0.0, 1.0);
+vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
+vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
+vec4 mauden = vec4(0, 0, 0.0, 1.0);
+vec4 maulacay = vec4(0.0, 1.0, 0.0, 1.0);
+vec4 mauthancay = vec4(0.5, 0.2, 0.0, 1.0);
+
+
+GLuint program;
+GLuint loc_modelMatrix;
+GLuint loc_Ambient;
+GLuint loc_Specular;
+GLuint loc_Diffuse;
+GLuint loc_LightPosition;
+GLuint loc_Shininess;
+GLuint loc_view;
+GLuint loc_projection;
 
 color4 material_ambient(1.0, 1.0, 1.0, 1.0);
 color4 material_diffuse(1.0, 0.8, 0.0, 1.0);
 color4 material_specular(1.0, 0.8, 0.0, 1.0);
 float material_shininess = 100.0;
+
+/* Khởi tạo các tham số chiếu sáng - tô bóng*/
+const int Light_number = 9;
+point4 light_position[Light_number];
+color4 light_ambient(0.2, 0.2, 0.2, 1.0);
+color4 light_diffuse(1.0, 1.0, 1.0, 1.0);
+color4 light_specular(1.0, 1.0, 1.0, 1.0);
 
 color4 ambient_product = light_ambient * material_ambient;
 color4 diffuse_product = light_diffuse * material_diffuse;
@@ -189,43 +217,85 @@ void shaderSetup(void)
 	glEnableVertexAttribArray(loc_vNormal);
 	glVertexAttribPointer(loc_vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points) + sizeof(colors)));
 
-	glUniform4fv(glGetUniformLocation(program, "AmbientProduct"), 1, ambient_product);
-	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product);
-	glUniform4fv(glGetUniformLocation(program, "SpecularProduct"), 1, specular_product);
-	glUniform4fv(glGetUniformLocation(program, "LightPosition"), 1, light_position);
-	glUniform1f(glGetUniformLocation(program, "Shininess"), material_shininess);
+	loc_Ambient = glGetUniformLocation(program, "AmbientProduct");
+	loc_Diffuse = glGetUniformLocation(program, "DiffuseProduct");
+	loc_Specular = glGetUniformLocation(program, "SpecularProduct");
+
+	loc_LightPosition = glGetUniformLocation(program, "LightPosition");
+	loc_Shininess = glGetUniformLocation(program, "Shininess");
 
 	loc_modelMatrix = glGetUniformLocation(program, "modelMatrix");
 	loc_projection = glGetUniformLocation(program, "Projection");
-	view_loc = glGetUniformLocation(program, "View");
+	loc_view = glGetUniformLocation(program, "View");
 	glEnable(GL_DEPTH_TEST);
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);        /* Thiết lập màu trắng là màu xóa màn hình*/
 }
 
-GLfloat z, x;
-vec4 mautu = vec4(0.9, 0.9, 0.9, 1.0);
-vec4 maucuatu = vec4(0.8, 0.8, 0.8, 1.0);
-vec4 mautaykeocuatu = vec4(0.5, 0.5, 0.4, 1.0);
-vec4 maumaychieu = vec4(1.0, 0.0, 1.0, 1.0);
-vec4 maudieuhoa = vec4(0.6, 0.7, 0.5, 1.0);
-vec4 maubang = vec4(0.0, 0.0, 0.0, 1.0);
-vec4 maumanchieu = vec4(1.0, 1.0, 1.0, 1.0);
-vec4 maucua = vec4(1.0, 1.0, 0.0, 1.0);
-vec4 maubanghe = vec4(1.0, 0.0, 0.0, 1.0);
-vec4 maumaytinh = vec4(0.0, 1.0, 0.0, 1.0);
-vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
-vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
-vec4 mauden = vec4(0, 0, 0.0, 1.0);
-vec4 maulacay = vec4(0.0, 1.0, 0.0, 1.0);
-vec4 mauthancay = vec4(0.5, 0.2, 0.0, 1.0);
 
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 
 	material_diffuse = colorCode;
-	diffuse_product = light_diffuse * material_diffuse;
+	light_position[0] = point4(0.0, 4.0, 4.0, 1.0);
+	color4 ambient_product = light_ambient * material_ambient;
+	color4 diffuse_product = light_diffuse * material_diffuse;
+	color4 specular_product = light_specular * material_specular;
 
-	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product);
+	glUniform4fv(loc_Ambient, 1, ambient_product);
+	glUniform4fv(loc_Specular, 1, specular_product);
+	glUniform4fv(loc_Diffuse, 1, diffuse_product);
+	glUniform4fv(loc_LightPosition, 1, light_position[0]);
+	glUniform1f(loc_Shininess, material_shininess);
+
+	mat4 ins = Scale(x, y, z);
+	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase * mt * ins);
+	glDrawArrays(GL_TRIANGLES, 0, NumPoints);
+}
+
+// Khởi tạo khối hộp 
+void cube(point3 model, mat4 mt, color4 material_ambient, color4 material_diffuse, color4 material_specular, float material_shininess, point4 light_position) {
+
+	color4 ambient_product = light_ambient * material_ambient;
+	color4 diffuse_product = light_diffuse * material_diffuse;
+	color4 specular_product = light_specular * material_specular;
+
+	glUniform4fv(loc_Ambient, 1, ambient_product);
+	glUniform4fv(loc_Specular, 1, specular_product);
+	glUniform4fv(loc_Diffuse, 1, diffuse_product);
+	glUniform4fv(loc_LightPosition, 1, light_position);
+	glUniform1f(loc_Shininess, material_shininess);
+
+	mat4 ins = Scale(model);
+	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase * mt * ins);
+	glDrawArrays(GL_TRIANGLES, 0, NumPoints);
+}
+
+// Khởi tạo khối hộp 
+bool light_state = true;
+void cube(GLfloat x, GLfloat y, GLfloat z, mat4 mt, color4 material_ambient, color4 material_diffuse, color4 material_specular, float material_shininess, point4* light_position) {
+	if (light_state) {
+		light_ambient = color4(0.2, 0.2, 0.2, 1.0);
+		light_diffuse = color4(1.0, 1.0, 1.0, 1.0);
+		light_specular = color4(1.0, 1.0, 1.0, 1.0);
+	}
+	else {
+		light_ambient = color4(0, 0, 0, 1.0);
+		light_diffuse = color4(0, 0, 0, 1.0);
+		light_specular = color4(0, 0, 0, 1.0);
+	}
+
+	color4 ambient_product = light_ambient * material_ambient;
+	color4 diffuse_product = light_diffuse * material_diffuse;
+	color4 specular_product = light_specular * material_specular;
+
+	glUniform4fv(loc_Ambient, 1, ambient_product);
+	glUniform4fv(loc_Specular, 1, specular_product);
+	glUniform4fv(loc_Diffuse, 1, diffuse_product);
+	for (int i = 0; i < sizeof(light_position); i++) {
+		glUniform4fv(loc_LightPosition, i, light_position[i]);
+	}
+
+	glUniform1f(loc_Shininess, material_shininess);
 	mat4 ins = Scale(x, y, z);
 	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase * mt * ins);
 	glDrawArrays(GL_TRIANGLES, 0, NumPoints);
@@ -234,9 +304,16 @@ void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 void hinhTru(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 
 	material_diffuse = colorCode;
-	diffuse_product = light_diffuse * material_diffuse;
+	color4 ambient_product = light_ambient * material_ambient;
+	color4 diffuse_product = light_diffuse * material_diffuse;
+	color4 specular_product = light_specular * material_specular;
 
-	glUniform4fv(glGetUniformLocation(program, "DiffuseProduct"), 1, diffuse_product);
+	glUniform4fv(loc_Ambient, 1, ambient_product);
+	glUniform4fv(loc_Specular, 1, specular_product);
+	glUniform4fv(loc_Diffuse, 1, diffuse_product);
+	glUniform4fv(loc_LightPosition, 1, light_position[0]);
+	glUniform1f(loc_Shininess, material_shininess);
+
 	mat4 ins = Scale(x, y, z);
 	glUniformMatrix4fv(loc_modelMatrix, 1, GL_TRUE, quayBase * mt * ins);
 	glDrawArrays(GL_TRIANGLES, NumPoints, diemHinhTru);
@@ -258,7 +335,7 @@ void khungNhin() {
 	vec4 up(0, 1, 0, 1.0);
 
 	mat4 v = LookAt(eye, at, up);
-	glUniformMatrix4fv(view_loc, 1, GL_TRUE, v);
+	glUniformMatrix4fv(loc_view, 1, GL_TRUE, v);
 
 	mat4 p = Frustum(l, r, b, t, zNear, zFar);
 	glUniformMatrix4fv(loc_projection, 1, GL_TRUE, p);
@@ -315,37 +392,37 @@ void Loa() {
 
 void matBan() {
 	model = Translate(0, 0.3, 0);
-	matPhang(0.8, 0.02, 0.4, model, maubanghe);
+	cube(0.8, 0.02, 0.4, model, color4(0.23125, 0.23125, 0.23125, 1.0), color4(0.2775, 0.2775, 0.2775, 1.0), color4(0.773911, 0.773911, 0.773911, 1.0), 89.6, light_position);
 }
 
 void chanBan() {
 	//chan 1
 	model = Translate(-0.375, -0.01, -0.2);
-	matPhang(0.02, 0.6, 0.02, model, maubanghe);
+	cube(0.02, 0.6, 0.02, model, color4(0.23125, 0.23125, 0.23125, 1.0), color4(0.2775, 0.2775, 0.2775, 1.0), color4(0.773911, 0.773911, 0.773911, 1.0), 89.6, light_position);
 
 	//chan 2
 	model = Translate(-0.375, -0.01, 0.2);
-	matPhang(0.02, 0.6, 0.02, model, maubanghe);
+	cube(0.02, 0.6, 0.02, model, color4(0.23125, 0.23125, 0.23125, 1.0), color4(0.2775, 0.2775, 0.2775, 1.0), color4(0.773911, 0.773911, 0.773911, 1.0), 89.6, light_position);
 
 	//chan 3
 	model = Translate(0.375, -0.01, -0.2);
-	matPhang(0.02, 0.6, 0.02, model, maubanghe);
+	cube(0.02, 0.6, 0.02, model, color4(0.23125, 0.23125, 0.23125, 1.0), color4(0.2775, 0.2775, 0.2775, 1.0), color4(0.773911, 0.773911, 0.773911, 1.0), 89.6, light_position);
 
 	//chan 4
 	model = Translate(0.375, -0.01, 0.2);
-	matPhang(0.02, 0.6, 0.02, model, maubanghe);
+	cube(0.02, 0.6, 0.02, model, color4(0.23125, 0.23125, 0.23125, 1.0), color4(0.2775, 0.2775, 0.2775, 1.0), color4(0.773911, 0.773911, 0.773911, 1.0), 89.6, light_position);
 
 	//thang doc 1
 	model = Translate(-0.375, -0.24, 0);
-	matPhang(0.02, 0.02, 0.4, model, maubanghe);
+	cube(0.02, 0.02, 0.4, model, color4(0.23125, 0.23125, 0.23125, 1.0), color4(0.2775, 0.2775, 0.2775, 1.0), color4(0.773911, 0.773911, 0.773911, 1.0), 89.6, light_position);
 
 	//thanh doc 2
 	model = Translate(0.375, -0.24, 0);
-	matPhang(0.02, 0.02, 0.4, model, maubanghe);
+	cube(0.02, 0.02, 0.4, model, color4(0.23125, 0.23125, 0.23125, 1.0), color4(0.2775, 0.2775, 0.2775, 1.0), color4(0.773911, 0.773911, 0.773911, 1.0), 89.6, light_position);
 
 	//thanh ngang
 	model = Translate(0, -0.24, 0);
-	matPhang(0.78, 0.02, 0.02, model, maubanghe);
+	cube(0.78, 0.02, 0.02, model, color4(0.23125, 0.23125, 0.23125, 1.0), color4(0.2775, 0.2775, 0.2775, 1.0), color4(0.773911, 0.773911, 0.773911, 1.0), 89.6, light_position);
 
 	//hop may tinh
 	model = Translate(-0.2, 0.02, 0.05);
@@ -458,13 +535,20 @@ void cayCanh() {
 
 }
 
-//den
-
 bool isDenOpen = false;
 void Den() {
-	vec4 mauDen = isDenOpen ? mautrang : vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	vec4 mauDen;
+	if (isDenOpen) {
+		mauDen = mautrang;
+		light_state = true;
+	}
+	else {
+		mauDen = mauden;
+		light_state = false;
+	}
 	model = Translate(0, 0.25, 0);
-	matPhang(1.0, 0.02, 0.8, model, mauDen);
+	cube(1.0, 0.02, 0.8, model, material_ambient, mauDen, material_specular, material_shininess, light_position);
+
 }
 
 GLfloat quayLaptop = 0;
@@ -738,7 +822,7 @@ void cuaSo() {
 
 }
 void tranNha() {
-	model = Translate(0, 4.68, -1.95);
+	model = Translate(0, 4.66, -1.95);
 	matPhang(6.5, 0.02, 10, model, maucua);
 }
 void tuongSau() {
@@ -1097,6 +1181,26 @@ void moHCD(int value) {
 	glutTimerFunc(100, moHCD, 0);
 }
 
+void keoGhe(int value) {
+	if (!checkkeoghe) {
+		if (keoghe <= -0.4) {
+			keoghe = -0.4;
+			checkkeoghe = true;
+			return;
+		}
+		keoghe -= 0.02;
+	}
+	else {
+		if (keoghe >= 0) {
+			keoghe = 0;
+			checkkeoghe = false;
+			return;
+		}
+		keoghe += 0.02;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, keoGhe, 0);
+}
 
 
 void camera_movement(unsigned char key) {
@@ -1247,20 +1351,7 @@ void keyboard(unsigned char key, int x, int y)
 
 			//kéo ghế - h
 	case 'h': {
-		if (!checkkeoghe) {
-			keoghe -= 0.02;
-			if (keoghe <= -0.4) {
-				keoghe = -0.4;
-				checkkeoghe = true;
-			}
-		}
-		else {
-			keoghe += 0.02;
-			if (keoghe >= 0) {
-				keoghe = 0;
-				checkkeoghe = false;
-			}
-		}
+		keoGhe(0);
 		break;
 	}
 
