@@ -172,7 +172,6 @@ vec4 maumaytinh = vec4(0.0, 1.0, 0.0, 1.0);
 vec4 mautuong = vec4(0.0, 1.0, 1.0, 1.0);
 vec4 mautrang = vec4(1.0, 1.0, 1.0, 1.0);
 
-GLfloat xcam, ycam, zcam;
 void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 
 	material_diffuse = colorCode;
@@ -185,105 +184,22 @@ void matPhang(GLfloat x, GLfloat y, GLfloat z, mat4 mt, vec4 colorCode) {
 }
 
 
-point4 Rotate_at(point4 eye, point4 at, GLfloat theta) {
-	GLfloat angle = DegreesToRadians * theta;
-
-	//vec4 eye_at_vec = vec4(at.x - eye.x, at.y - eye.y, at.z - eye.z, 1.0);
-
-	mat4 at_mat;
-	at_mat[0][0] = at.x;
-	at_mat[1][0] = at.y;
-	at_mat[2][0] = at.z;
-	at_mat[3][0] = 1.0;
-	//mat4 eye_mat = Translate(eye.x, eye.y, eye.z);
-	mat4 eye_mat;
-	eye_mat[0][3] = eye.x;
-	eye_mat[1][3] = eye.y;
-	eye_mat[2][3] = eye.z;
-	eye_mat[0][0] = eye_mat[1][1] = eye_mat[2][2] = eye_mat[3][3] = 1.0;
-
-	//mat4 rotate_mat = RotateY(theta);
-	mat4 rotate_mat;
-	rotate_mat[2][2] = rotate_mat[0][0] = cos(angle);
-	rotate_mat[0][2] = sin(angle);
-	rotate_mat[2][0] = -rotate_mat[0][2];
-	rotate_mat[1][1] = rotate_mat[3][3] = 1.0;
-
-	//mat4 at_mat;
-	//at_mat[3][0] = at.x;
-	//at_mat[3][1] = at.y;
-	//at_mat[3][2] = at.z;
-	//at_mat[0][0] = at_mat[1][1] = at_mat[2][2] = at_mat[3][3] = 1;
-	//Print("Mat");
-	//Print((float) at_mat[3][0]);
-	//Print((float) at_mat[3][1]);
-	//Print((float) at_mat[3][2]);
-	mat4 at2_mat = rotate_mat * at_mat * eye_mat;
-
-
-	/*point4 at_point(at_mat[3][0], at_mat[3][1], at_mat[3][2], 1.0);*/
-
-	point4 at_point(at2_mat[0][0], at2_mat[1][0], at2_mat[2][0], 1.0);
-	return at_point;
-}
-
-point4 Rotate_eye(point4 eye, GLfloat theta) {
-	GLfloat angle = DegreesToRadians * theta;
-
-	//vec4 eye_at_vec = vec4(at.x - eye.x, at.y - eye.y, at.z - eye.z, 1.0);
-
-
-	mat4 eye_mat;
-	eye_mat[0][0] = eye.x;
-	eye_mat[1][0] = eye.y;
-	eye_mat[2][0] = eye.z;
-	/*at_mat[3][0] = 1.0;*/
-	//mat4 eye_mat = Translate(eye.x, eye.y, eye.z);
-	//mat4 eye_mat;
-	//eye_mat[0][3] = eye.x;
-	//eye_mat[1][3] = eye.y;
-	//eye_mat[2][3] = eye.z;
-	/*eye_mat[0][0] = eye_mat[1][1] = eye_mat[2][2] = eye_mat[3][3] = 1.0;*/
-
-	mat4 rotate_mat = RotateY(theta);
-	//mat4 rotate_mat;
-	//rotate_mat[2][2] = rotate_mat[0][0] = cos(angle);
-	//rotate_mat[0][2] = sin(angle);
-	//rotate_mat[2][0] = -rotate_mat[0][2];
-	/*rotate_mat[1][1] = rotate_mat[3][3] = 1.0;*/
-
-	//mat4 at_mat;
-	//at_mat[3][0] = at.x;
-	//at_mat[3][1] = at.y;
-	//at_mat[3][2] = at.z;
-	//at_mat[0][0] = at_mat[1][1] = at_mat[2][2] = at_mat[3][3] = 1;
-	//Print("Mat");
-	//Print((float) at_mat[3][0]);
-	//Print((float) at_mat[3][1]);
-	//Print((float) at_mat[3][2]);
-	mat4 eye2_mat = rotate_mat * eye_mat;
-
-
-	/*point4 at_point(at_mat[3][0], at_mat[3][1], at_mat[3][2], 1.0);*/
-
-	point4 eye_point(eye2_mat[0][0], eye2_mat[1][0], eye2_mat[2][0], 1.0);
-	return eye_point;
-
-}
-
+point4 eye = point4(0, 1, 0, 1.0);
+GLfloat xcam, ycam, zcam;
+GLfloat xat = 0, yat = 180, zat;
 void khungNhin() {
 
-	point4 eye(xcam, 1, zcam, 1.0);
+	point4 at = point4(0, 0, 1, 1.0);
+
+	eye = Translate(eye) * RotateY(yat) * point4(xcam, 0, zcam, 1.0);
+
+	at = Translate(eye) * RotateY(yat) * RotateX(xat) * at;
+
+	xcam = ycam = zcam = 0;
 
 	vec4 up(0, 1, 0, 1.0);
 
-	point4 at(xcam, 1, zcam + 1, 1.0);
-
-	point4 rotateEye = Rotate_eye(eye, thetal);
-
-	point4 rotateAt = Rotate_at(eye, at, thetal);
-
-	mat4 v = LookAt(rotateEye, rotateAt, up);
+	mat4 v = LookAt(eye, at, up);
 	glUniformMatrix4fv(view_loc, 1, GL_TRUE, v);
 
 	mat4 p = Frustum(l, r, b, t, zNear, zFar);
@@ -803,18 +719,45 @@ void moCuaso(int value) {
 
 void camera_movement(unsigned char key) {
 	switch (key) {
-	case 'd': xcam -= 0.1; break;
-	case 'a': xcam += 0.1; break;
-	case 'w': zcam += 0.1; break;
-	case 's': zcam -= 0.1; break;
+	case 'd':
+		xcam -= 0.1;
+		break;
+	case 'a':
+		xcam += 0.1;
+		break;
+	case 'w':
+		zcam += 0.1;
+		break;
+	case 's':
+		zcam -= 0.1;
+		break;
 	}
 }
 
 
 void camera_direction(int key, int a, int b) {
 	switch (key) {
-	case GLUT_KEY_LEFT: thetal -= 0.1; break;
-	case GLUT_KEY_RIGHT: thetal += 0.1; break;
+	case GLUT_KEY_LEFT:
+		yat += 2;
+		xcam = 0;
+		zcam = 0;
+		break;
+	case GLUT_KEY_RIGHT:
+		yat -= 2;
+		xcam = 0;
+		zcam = 0;
+		break;
+
+	case GLUT_KEY_UP:
+		xat += 2;
+		xcam = 0;
+		zcam = 0;
+		break;
+	case GLUT_KEY_DOWN:
+		xat -= 2;
+		xcam = 0;
+		zcam = 0;
+		break;
 	}
 	glutPostRedisplay();
 }
